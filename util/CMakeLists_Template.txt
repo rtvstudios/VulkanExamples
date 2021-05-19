@@ -1,7 +1,7 @@
 
-add_executable(GLFWWindow main.cpp)
+add_executable($PROJECT_NAME main.cpp)
 
-target_include_directories(GLFWWindow PRIVATE ../Common)
+target_include_directories($PROJECT_NAME PRIVATE ../Common)
 
 set(CUSTOM_LIBRARIES "")
 set(CUSTOM_INCLUDES "../Common")
@@ -23,7 +23,7 @@ message(STATUS "CUSTOM_INCLUDES: ${CUSTOM_INCLUDES}")
 message(STATUS "CUSTOM_LIBRARIES: ${CUSTOM_LIBRARIES}")
 
 
-target_include_directories(GLFWWindow PUBLIC ${CUSTOM_INCLUDES})
+target_include_directories($PROJECT_NAME PUBLIC ${CUSTOM_INCLUDES})
 
-target_link_libraries(GLFWWindow ${CUSTOM_LIBRARIES})
+target_link_libraries($PROJECT_NAME ${CUSTOM_LIBRARIES})
 
