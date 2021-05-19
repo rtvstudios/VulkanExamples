@@ -47,6 +47,7 @@ VulInstance::VulInstance(const std::string &appName) {
 
 VulInstance::~VulInstance() {
     if (isCreated()) {
+        mPhysicalDevice = nullptr;
         vkDestroyInstance(mInstance, nullptr);
     }
 }

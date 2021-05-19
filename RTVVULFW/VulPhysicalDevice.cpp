@@ -2,6 +2,9 @@
 #include "VulPhysicalDevice.h"
 #include "VulInstance.h"
 #include "Logger.h"
+#include "VulLogicalDevice.h"
+
+#include <optional>
 
 namespace rtvvulfw {
 
@@ -10,13 +13,14 @@ VulPhysicalDevice::VulPhysicalDevice(VulInstance *instance) : mInstance{ instanc
     vkEnumeratePhysicalDevices(mInstance->handle(), &deviceCount, nullptr);
 
     if (deviceCount == 0) {
+        LOG_ERROR(tag(), "Failed to find GPU with Vulkan support");
         throw std::runtime_error("Failed to find GPU with Vulkan support");
     }
 
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(mInstance->handle(), &deviceCount, devices.data());
 
-    auto isDeviceSuitable = [this](VkPhysicalDevice device) {
+    auto isDeviceWithGeometricShader = [this](VkPhysicalDevice device) {
         VkPhysicalDeviceProperties deviceProperties;
         VkPhysicalDeviceFeatures deviceFeatures;
 
@@ -31,25 +35,52 @@ VulPhysicalDevice::VulPhysicalDevice(VulInstance *instance) : mInstance{ instanc
     };
 
     for (const auto& device : devices) {
-        if (isDeviceSuitable(device)) {
+        if (isDeviceWithGeometricShader(device)) {
             mPhysicalDevice = device;
             break;
         }
     }
 
-    if (mPhysicalDevice == VK_NULL_HANDLE && !devices.empty()) {
-        LOG_INFO(tag(), "Could not find any suitable device taking the first available device");
-        mPhysicalDevice = devices.at(0);
+    std::optional<uint32_t> graphicsFamily;
+
+    auto isDeviceWithGraphicsCapability = [&graphicsFamily](VkPhysicalDevice device) {
+
+        uint32_t queueFamilyCount = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+        std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+        int i = 0;
+        for (const auto& queueFamily : queueFamilies) {
+            if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+                graphicsFamily = i;
+            }
+            ++i;
+        }
+        return  graphicsFamily.has_value();
+    };
+
+    if (mPhysicalDevice == VK_NULL_HANDLE) {
+        LOG_INFO(tag(), "Could not find the best device taking the one with graphics capability");
+        for (const auto& device : devices) {
+            if (isDeviceWithGraphicsCapability(device)) {
+                mPhysicalDevice = device;
+                break;
+            }
+        }
     }
 
     if (mPhysicalDevice == VK_NULL_HANDLE) {
+        LOG_ERROR(tag(), "Failed to find a suitable GPU");
         throw std::runtime_error("Failed to find a suitable GPU");
     }
+
+    mGraphicDevice = std::make_shared<VulLogicalDevice>(this, graphicsFamily.value());
 
 }
 
 VulPhysicalDevice::~VulPhysicalDevice() {
-
 }
 
 }

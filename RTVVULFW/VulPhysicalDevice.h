@@ -12,6 +12,7 @@
 namespace rtvvulfw {
 
 class VulInstance;
+class VulLogicalDevice;
 
 class VulPhysicalDevice: private NonCopyable {
 public:
@@ -34,6 +35,7 @@ protected:
     VulInstance *mInstance{ nullptr };
     VkResult mResult{ VK_NOT_READY };
     VkPhysicalDevice mPhysicalDevice{ VK_NULL_HANDLE };
+    std::shared_ptr<VulLogicalDevice> mGraphicDevice;
 };
 
 }

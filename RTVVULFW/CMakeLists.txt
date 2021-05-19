@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 
 project(RTVVULFW VERSION 1.0.1 DESCRIPTION "Framework for creating Vulkan applications")
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-
 file (GLOB RTVVULFW_SOURCES CONFIGURE_DEPENDS "*.cpp")
 file (GLOB RTVVULFW_HEADERS CONFIGURE_DEPENDS "*.h")
 
