@@ -1,0 +1,30 @@
+
+add_executable(GLFWWindow main.cpp)
+
+target_include_directories(GLFWWindow PRIVATE
+				../Common)
+
+set(CUSTOM_LIBRARIES "")
+set(CUSTOM_INCLUDES "../Common")
+
+if (WIN32)
+elseif (APPLE)
+	list(APPEND CUSTOM_INCLUDES "/usr/local/include")
+
+	set(GLFW_LIBRARY_PATH "/usr/local/lib")
+	set(VULKAN_LIBRARY_PATH "/usr/local/lib")
+
+	list(APPEND CUSTOM_LIBRARIES "${GLFW_LIBRARY_PATH}/libglfw.3.4.dylib")
+	list(APPEND CUSTOM_LIBRARIES "${VULKAN_LIBRARY_PATH}/libvulkan.1.2.176.dylib")
+	list(APPEND CUSTOM_LIBRARIES "${VULKAN_LIBRARY_PATH}/libvulkan.1.dylib")
+elseif (UNIX)
+endif()
+
+message(STATUS "CUSTOM_INCLUDES: ${CUSTOM_INCLUDES}")
+message(STATUS "CUSTOM_LIBRARIES: ${CUSTOM_LIBRARIES}")
+
+
+target_include_directories(GLFWWindow PUBLIC ${CUSTOM_INCLUDES})
+
+target_link_libraries(GLFWWindow ${CUSTOM_LIBRARIES})
+
