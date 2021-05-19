@@ -5,7 +5,23 @@ project(VulkanExamples)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_subdirectory(Common)
+set(CUSTOM_LIBRARIES "")
+set(CUSTOM_INCLUDES "RTVVULFW")
+
+if (WIN32)
+elseif (APPLE)
+	list(APPEND CUSTOM_INCLUDES "/usr/local/include")
+
+	set(GLFW_LIBRARY_PATH "/usr/local/lib")
+	set(VULKAN_LIBRARY_PATH "/usr/local/lib")
+
+	list(APPEND CUSTOM_LIBRARIES "${GLFW_LIBRARY_PATH}/libglfw.3.4.dylib")
+	list(APPEND CUSTOM_LIBRARIES "${VULKAN_LIBRARY_PATH}/libvulkan.1.2.176.dylib")
+	list(APPEND CUSTOM_LIBRARIES "${VULKAN_LIBRARY_PATH}/libvulkan.1.dylib")
+elseif (UNIX)
+endif()
+
+add_subdirectory(RTVVULFW)
 add_subdirectory(GLFWWindow)
 
 

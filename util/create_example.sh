@@ -20,7 +20,6 @@ CREATION_DATE=`date`
 mkdir $PROJECT_NAME
 ASSERT_SUCCESS "Could not create project directory $PROJECT_NAME"
 
-mkdir $PROJECT_NAME
 FILE_CONTENT=`cat CMakeLists_Template.txt`
 
 touch $PROJECT_NAME/CMakeLists.txt
