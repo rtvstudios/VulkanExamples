@@ -10,3 +10,5 @@ target_include_directories(GLFWWindow PUBLIC ${CUSTOM_INCLUDES})
 
 target_link_libraries(GLFWWindow ${CUSTOM_LIBRARIES})
 
+add_dependencies(GLFWWindow RTVVULFW)
+

@@ -10,3 +10,4 @@ target_include_directories($PROJECT_NAME PUBLIC ${CUSTOM_INCLUDES})
 
 target_link_libraries($PROJECT_NAME ${CUSTOM_LIBRARIES})
 
+add_dependencies($PROJECT_NAME RTVVULFW)
