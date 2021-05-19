@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(VulkanExamples)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(CUSTOM_LIBRARIES "")
@@ -26,6 +26,8 @@ endif()
 add_compile_definitions(GLFW_INCLUDE_VULKAN)
 add_compile_definitions(GLM_FORCE_RADIANS)
 add_compile_definitions(GLM_FORCE_DEPTH_ZERO_TO)
+add_compile_definitions(WITH_VALIDATION_LAYER)
+add_compile_definitions(DEBUG)
 
 add_subdirectory(RTVVULFW)
 add_subdirectory(GLFWWindow)

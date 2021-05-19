@@ -17,7 +17,7 @@ public:
 
 int main(int argc, const char * argv[]) {
     auto application = std::make_shared<GLFWWindow>();
-    application->createWindow("Vulkan Window");
+    application->createWindow("First Vulkan Window");
     application->run();
     
     return 0;

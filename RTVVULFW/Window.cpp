@@ -6,6 +6,7 @@ namespace rtvvulfw {
 Window::Window(const std::string &title, int width, int height) : mTitle{title},
         mWidth{ width },
         mHeight{ height } {
+            
     glfwInit();
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);

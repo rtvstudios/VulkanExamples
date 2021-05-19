@@ -1,5 +1,7 @@
 
 #include "VulInstance.h"
+#include "VulPhysicalDevice.h"
+#include "Logger.h"
 
 namespace rtvvulfw {
 
@@ -21,16 +23,51 @@ VulInstance::VulInstance(const std::string &appName) {
 
     mCreateInfo.enabledExtensionCount = glfwExtensionCount;
     mCreateInfo.ppEnabledExtensionNames = glfwExtensions;
-
     mCreateInfo.enabledLayerCount = 0;
 
+#ifdef WITH_VALIDATION_LAYER
+    LOG_DEBUG(tag(), "Validation layer option enabled");
+    if (isValidationLayerAvailable()) {
+        LOG_INFO(tag(), "Validation layer available");
+        mCreateInfo.enabledLayerCount = mValidationLayers.size();
+        mCreateInfo.ppEnabledLayerNames = mValidationLayers.data();
+    } else {
+        LOG_WARN(tag(), "Validation layer not available");
+    }
+#endif
+
     mResult = vkCreateInstance(&mCreateInfo, nullptr, &mInstance);
+
+    if (isCreated()) {
+        mPhysicalDevice = std::make_shared<VulPhysicalDevice>(this);
+    } else {
+        LOG_ERROR(tag(), "Could not create Vulkan Instance");
+    }
 }
 
 VulInstance::~VulInstance() {
     if (isCreated()) {
         vkDestroyInstance(mInstance, nullptr);
     }
+}
+
+bool VulInstance::isValidationLayerAvailable() const {
+    uint32_t layerCount;
+    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+    std::vector<VkLayerProperties> availableLayers(layerCount);
+
+    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+    for (auto layerName : mValidationLayers) {
+        for (const auto& layerProperties : availableLayers) {
+            if (std::string(layerName) == layerProperties.layerName) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 }

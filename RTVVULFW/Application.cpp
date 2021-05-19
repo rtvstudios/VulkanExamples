@@ -5,9 +5,9 @@
 
 namespace rtvvulfw {
 
-std::shared_ptr<Window> Application::createWindow(const std::string &title) {
+Window* Application::createWindow(const std::string &title) {
     mWindow = std::make_shared<Window>(title);
-    return mWindow;
+    return mWindow.get();
 }
 
 void Application::run() {

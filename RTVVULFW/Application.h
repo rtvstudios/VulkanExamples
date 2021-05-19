@@ -14,12 +14,12 @@ class VulInstance;
 
 class Application: private NonCopyable {
 public:
-    virtual std::shared_ptr<Window> createWindow(const std::string &title);
+    virtual Window* createWindow(const std::string &title);
 
     virtual void run();
 
-    std::shared_ptr<Window> window() {
-        return mWindow;
+    Window* window() {
+        return mWindow.get();
     }
 
 protected:
