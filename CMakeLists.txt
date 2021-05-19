@@ -5,8 +5,8 @@ project(VulkanExamples)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(CUSTOM_LIBRARIES "RTVVULFW")
-set(CUSTOM_INCLUDES "RTVVULFW")
+set(CUSTOM_LIBRARIES "")
+set(CUSTOM_INCLUDES "")
 
 if (WIN32)
 	message(FATAL_ERROR "Windows not supported yet")
@@ -22,6 +22,10 @@ elseif (APPLE)
 elseif (UNIX)
 	message(FATAL_ERROR "Unix not supported yet")
 endif()
+
+add_compile_definitions(GLFW_INCLUDE_VULKAN)
+add_compile_definitions(GLM_FORCE_RADIANS)
+add_compile_definitions(GLM_FORCE_DEPTH_ZERO_TO)
 
 add_subdirectory(RTVVULFW)
 add_subdirectory(GLFWWindow)

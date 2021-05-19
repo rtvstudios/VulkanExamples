@@ -6,8 +6,8 @@ file (GLOB HEADERS CONFIGURE_DEPENDS "*.h")
 
 add_executable($PROJECT_NAME ${HEADERS} ${SOURCES})
 
-target_include_directories($PROJECT_NAME PUBLIC ${CUSTOM_INCLUDES})
+target_include_directories($PROJECT_NAME PUBLIC ${CUSTOM_INCLUDES} "../RTVVULFW")
 
-target_link_libraries($PROJECT_NAME ${CUSTOM_LIBRARIES})
+target_link_libraries($PROJECT_NAME ${CUSTOM_LIBRARIES} "RTVVULFW")
 
 add_dependencies($PROJECT_NAME RTVVULFW)
