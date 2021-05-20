@@ -22,6 +22,10 @@ public:
         return mTitle;
     }
 
+    GLFWwindow *handle() {
+        return mWindow;
+    }
+
 protected:
     std::string mTitle{ "Vulkan Window" };
     int mWidth{ 800 };

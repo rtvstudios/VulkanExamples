@@ -32,6 +32,10 @@ public:
         return mDevice != VK_NULL_HANDLE;
     }
 
+    VulQueue *queue() {
+        return mQueue.get();
+    }
+
 protected:
     VkDevice mDevice{ VK_NULL_HANDLE };
     VulPhysicalDevice *mPhysicalDevice{ nullptr };
