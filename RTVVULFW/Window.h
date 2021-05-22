@@ -11,7 +11,7 @@ namespace rtvvulfw {
 
 class Window: private NonCopyable {
 public:
-    Window(const std::string &title, int width=800, int height=600);
+    Window(const std::string &title, uint32_t width=800, uint32_t height=600);
     ~Window();
 
     bool shouldClose() {
@@ -26,10 +26,18 @@ public:
         return mWindow;
     }
 
+    uint32_t width() const {
+        return mWidth;
+    }
+
+    uint32_t height() const {
+        return mHeight;
+    }
+
 protected:
     std::string mTitle{ "Vulkan Window" };
-    int mWidth{ 800 };
-    int mHeight{ 600 };
+    uint32_t mWidth{ 800 };
+    uint32_t mHeight{ 600 };
     GLFWwindow* mWindow{ nullptr };
 };
 

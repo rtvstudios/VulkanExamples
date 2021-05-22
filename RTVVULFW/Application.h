@@ -33,7 +33,6 @@ protected:
     virtual void cleanup();
     virtual void mainLoop();
 
-    std::shared_ptr<VulSurface> mSurface;
     std::shared_ptr<Window> mWindow;
     std::shared_ptr<VulInstance> mVulInstance;
 };

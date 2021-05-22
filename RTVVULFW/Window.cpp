@@ -3,7 +3,7 @@
 
 namespace rtvvulfw {
 
-Window::Window(const std::string &title, int width, int height) : mTitle{title},
+Window::Window(const std::string &title, uint32_t width, uint32_t height) : mTitle{title},
         mWidth{ width },
         mHeight{ height } {
             

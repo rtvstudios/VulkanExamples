@@ -3,12 +3,22 @@
 #include "VulInstance.h"
 #include "Logger.h"
 #include "VulLogicalDevice.h"
+#include "VulSurface.h"
+#include "Window.h"
+#include "VulSwapChain.h"
 
 #include <optional>
+#include <sstream>
 
 namespace rtvvulfw {
 
-VulPhysicalDevice::VulPhysicalDevice(VulInstance *instance) : mInstance{ instance } {
+const std::vector<const char*> VulPhysicalDevice::deviceExtensions = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+};
+
+VulPhysicalDevice::VulPhysicalDevice(VulInstance *instance, VulSurface *surface, Window *window) :
+    mInstance{ instance }, mSurface{ surface }, mWindow{ window} {
+
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(mInstance->handle(), &deviceCount, nullptr);
 
@@ -42,8 +52,9 @@ VulPhysicalDevice::VulPhysicalDevice(VulInstance *instance) : mInstance{ instanc
     }
 
     std::optional<uint32_t> graphicsFamily;
+    std::optional<uint32_t> presentFamily;
 
-    auto isDeviceWithGraphicsCapability = [&graphicsFamily](VkPhysicalDevice device) {
+    auto isDeviceWithGraphicsCapabilities = [&graphicsFamily, &presentFamily, this](VkPhysicalDevice device) {
 
         uint32_t queueFamilyCount = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
@@ -56,15 +67,26 @@ VulPhysicalDevice::VulPhysicalDevice(VulInstance *instance) : mInstance{ instanc
             if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
                 graphicsFamily = i;
             }
+            VkBool32 presentSupport = 0;
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, mInstance->surface()->handle(), &presentSupport);
+            if (presentSupport) {
+                presentFamily = i;
+            }
+
             ++i;
         }
-        return  graphicsFamily.has_value();
+
+        auto swapChainSupport = VulSwapChain::querySwapChainSupport(device, mSurface->handle());
+
+        return  graphicsFamily.has_value() && presentFamily.has_value() &&
+                checkDeviceExtensionSupport(device) && !swapChainSupport.formats.empty() &&
+                !swapChainSupport.presentModes.empty();
     };
 
     if (mPhysicalDevice == VK_NULL_HANDLE) {
         LOG_INFO(tag(), "Could not find the best device taking the one with graphics capability");
         for (const auto& device : devices) {
-            if (isDeviceWithGraphicsCapability(device)) {
+            if (isDeviceWithGraphicsCapabilities(device)) {
                 mPhysicalDevice = device;
                 break;
             }
@@ -76,11 +98,49 @@ VulPhysicalDevice::VulPhysicalDevice(VulInstance *instance) : mInstance{ instanc
         throw std::runtime_error("Failed to find a suitable GPU");
     }
 
-    mGraphicDevice = std::make_shared<VulLogicalDevice>(this, graphicsFamily.value());
+    LOG_DEBUG(tag(), "Physical Device Created");
+    
+    LOG_DEBUG(tag(), "Extensions : " << getAllExtensions(mPhysicalDevice));
+
+    mGraphicDevice = std::make_shared<VulLogicalDevice>(this, graphicsFamily.value(), presentFamily.value());
+    mSwapChain = std::make_shared<VulSwapChain>(this, mGraphicDevice.get(), mSurface, mWindow);
+    mSwapChain->create(graphicsFamily.value(), presentFamily.value());
 
 }
 
+std::string VulPhysicalDevice::getAllExtensions(VkPhysicalDevice device) const {
+    uint32_t extensionCount;
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+    std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+
+    std::stringstream str;
+    for (const auto &extension: availableExtensions) {
+        str << extension.extensionName << ", ";
+    }
+    return str.str();
+}
+
+bool VulPhysicalDevice::checkDeviceExtensionSupport(VkPhysicalDevice device)  const {
+    uint32_t extensionCount;
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+    std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+
+    std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+    for (const auto& extension : availableExtensions) {
+        requiredExtensions.erase(extension.extensionName);
+    }
+
+    return requiredExtensions.empty();
+}
+
 VulPhysicalDevice::~VulPhysicalDevice() {
+    mSwapChain = nullptr;
+    mGraphicDevice = nullptr;
 }
 
 }

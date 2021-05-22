@@ -8,15 +8,22 @@
 
 #include "NonCopyable.h"
 #include <GLFW/glfw3.h>
+#include <vector>
+#include <set>
 
 namespace rtvvulfw {
 
 class VulInstance;
 class VulLogicalDevice;
+class VulSurface;
+class Window;
+class VulSwapChain;
 
 class VulPhysicalDevice: private NonCopyable {
 public:
-    VulPhysicalDevice(VulInstance *instance);
+    static const std::vector<const char*> deviceExtensions;
+
+    VulPhysicalDevice(VulInstance *instance, VulSurface *surface, Window *window);
     ~VulPhysicalDevice();
 
     bool isCreated() const {
@@ -32,10 +39,18 @@ public:
     }
 
 protected:
+
+    bool checkDeviceExtensionSupport(VkPhysicalDevice device) const;
+    
+    std::string getAllExtensions(VkPhysicalDevice device) const;
+
     VulInstance *mInstance{ nullptr };
     VkResult mResult{ VK_NOT_READY };
+    VulSurface *mSurface{ nullptr };
+    Window *mWindow{ nullptr };
     VkPhysicalDevice mPhysicalDevice{ VK_NULL_HANDLE };
     std::shared_ptr<VulLogicalDevice> mGraphicDevice;
+    std::shared_ptr<VulSwapChain> mSwapChain;
 };
 
 }

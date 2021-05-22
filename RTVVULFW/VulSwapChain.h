@@ -60,6 +60,7 @@ protected:
     VkExtent2D mSwapExtent;
 
     std::vector<VkImage> mSwapChainImages;
+    std::vector<VkImageView> mSwapChainImageViews;
 
     std::atomic_bool mCreated{ false };
 };

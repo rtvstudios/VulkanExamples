@@ -12,10 +12,12 @@
 namespace rtvvulfw {
 
 class VulPhysicalDevice;
+class VulSurface;
+class Window;
 
 class VulInstance: private NonCopyable {
 public:
-    VulInstance(const std::string &appName);
+    VulInstance(const std::string &appName, Window *window);
     ~VulInstance();
 
     bool isCreated() const {
@@ -32,15 +34,23 @@ public:
         return "VulInstance";
     }
 
+    VulSurface * surface() {
+        return mSurface.get();
+    }
+
 protected:
+
     VkResult mResult{ VK_NOT_READY };
     VkInstance mInstance{ VK_NULL_HANDLE };
     VkApplicationInfo mAppInfo{};
     VkInstanceCreateInfo mCreateInfo{};
 
     std::shared_ptr<VulPhysicalDevice> mPhysicalDevice;
+    std::shared_ptr<VulSurface> mSurface;
 
     std::vector<const char*> mValidationLayers = { "VK_LAYER_KHRONOS_validation" };
+
+
 };
 
 }

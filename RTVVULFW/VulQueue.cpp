@@ -11,6 +11,8 @@ VulQueue::VulQueue(VulLogicalDevice *logicalDevice, uint32_t queueIndex) : mLogi
         LOG_ERROR(tag(), "Could not get queue handle");
         throw std::runtime_error("Could not get queue handle");
     }
+
+    LOG_DEBUG(tag(), "Queue Created : " << queueIndex);
 }
 
 VulQueue::~VulQueue() {

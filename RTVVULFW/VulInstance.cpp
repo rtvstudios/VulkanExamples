@@ -2,10 +2,11 @@
 #include "VulInstance.h"
 #include "VulPhysicalDevice.h"
 #include "Logger.h"
+#include "VulSurface.h"
 
 namespace rtvvulfw {
 
-VulInstance::VulInstance(const std::string &appName) {
+VulInstance::VulInstance(const std::string &appName, Window *window) {
     mAppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     mAppInfo.pApplicationName = appName.c_str();
     mAppInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -39,15 +40,18 @@ VulInstance::VulInstance(const std::string &appName) {
     mResult = vkCreateInstance(&mCreateInfo, nullptr, &mInstance);
 
     if (isCreated()) {
-        mPhysicalDevice = std::make_shared<VulPhysicalDevice>(this);
+        mSurface = std::make_shared<VulSurface>(this, window);
+
+        mPhysicalDevice = std::make_shared<VulPhysicalDevice>(this, mSurface.get(), window);
     } else {
         LOG_ERROR(tag(), "Could not create Vulkan Instance");
     }
 }
 
 VulInstance::~VulInstance() {
+    mSurface = nullptr;
+    mPhysicalDevice = nullptr;
     if (isCreated()) {
-        mPhysicalDevice = nullptr;
         vkDestroyInstance(mInstance, nullptr);
     }
 }

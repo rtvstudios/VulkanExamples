@@ -2,7 +2,6 @@
 #include "Application.h"
 #include "Window.h"
 #include "VulInstance.h"
-#include "VulSurface.h"
 
 namespace rtvvulfw {
 
@@ -22,16 +21,13 @@ void Application::run() {
 }
 
 void Application::init() {
-    mVulInstance = std::make_shared<VulInstance>(mWindow->title());
+    mVulInstance = std::make_shared<VulInstance>(mWindow->title(), mWindow.get());
     if (!mVulInstance->isCreated()) {
         throw std::runtime_error("Failed to create Vulkan instance");
     }
-
-    mSurface = std::make_shared<VulSurface>(mVulInstance.get(), mWindow.get());
 }
 
 void Application::cleanup() {
-    mSurface = nullptr;
     mVulInstance = nullptr;
     mWindow = nullptr;
 }
