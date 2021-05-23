@@ -23,6 +23,10 @@ public:
         return mWindow.get();
     }
 
+    const char * tag() const {
+        return "Application";
+    }
+
 protected:
     Application() = default;
     ~Application() {

@@ -1,13 +1,24 @@
+cmake_minimum_required(VERSION 3.10)
 
 project($PROJECT_NAME)
 
 file (GLOB SOURCES CONFIGURE_DEPENDS "*.cpp")
 file (GLOB HEADERS CONFIGURE_DEPENDS "*.h")
 
-add_executable($PROJECT_NAME ${HEADERS} ${SOURCES})
+file(GLOB SHADERS *.frag *.vert)
 
-target_include_directories($PROJECT_NAME PUBLIC ${CUSTOM_INCLUDES} "../RTVVULFW")
+add_executable($PROJECT_NAME ${SHADERS} ${HEADERS} ${SOURCES})
 
-target_link_libraries($PROJECT_NAME ${CUSTOM_LIBRARIES} "RTVVULFW")
+target_include_directories($PROJECT_NAME PUBLIC ${CUSTOM_INCLUDES} "../RVKFW")
 
-add_dependencies($PROJECT_NAME RTVVULFW)
+target_link_libraries($PROJECT_NAME ${CUSTOM_LIBRARIES} "RVKFW")
+
+foreach(SHADER ${SHADERS})
+add_custom_command(OUTPUT ${SHADER}.spv
+COMMAND glslc ${CMAKE_CURRENT_SOURCE_DIR}/${SHADER} -g -o ${SHADER}.spv
+DEPENDS ${SHADER}
+COMMENT "Rebuilding ${SHADER}.spv" )
+message(STATUS "Generating build commands for ${SHADER}.spv")
+endforeach()
+
+add_dependencies($PROJECT_NAME RVKFW)
