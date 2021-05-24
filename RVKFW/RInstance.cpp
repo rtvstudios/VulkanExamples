@@ -3,10 +3,11 @@
 #include "RPhysicalDevice.h"
 #include "RLogger.h"
 #include "RSurface.h"
+#include "RCreator.h"
 
 namespace rvkfw {
 
-RInstance::RInstance(const std::string &appName, RWindow *window) {
+void RInstance::create(const std::string &appName, std::shared_ptr<RWindow> window) {
     mAppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     mAppInfo.pApplicationName = appName.c_str();
     mAppInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -40,13 +41,13 @@ RInstance::RInstance(const std::string &appName, RWindow *window) {
     mResult = vkCreateInstance(&mCreateInfo, nullptr, &mInstance);
 
     if (isCreated()) {
-        mSurface = std::make_shared<RSurface>(this, window);
-
-        mPhysicalDevice = std::make_shared<RPhysicalDevice>(this, mSurface.get(), window);
+        mSurface = RCreator::create<RSurface>(shared_from_this(), window);
+        mPhysicalDevice = RCreator::create<RPhysicalDevice>(shared_from_this(), mSurface, window);
     } else {
         LOG_ERROR(tag(), "Could not create Vulkan Instance");
     }
 }
+
 
 RInstance::~RInstance() {
     mSurface = nullptr;

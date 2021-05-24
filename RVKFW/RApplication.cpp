@@ -3,12 +3,12 @@
 #include "RWindow.h"
 #include "RInstance.h"
 #include "RLogger.h"
+#include "RCreator.h"
 
 namespace rvkfw {
 
-RWindow* RApplication::createWindow(const std::string &title) {
-    mWindow = std::make_shared<RWindow>(title);
-    return mWindow.get();
+void RApplication::create(const std::string &title) {
+    mWindow = RCreator::create<RWindow>(title);
 }
 
 void RApplication::run() {
@@ -24,8 +24,8 @@ void RApplication::run() {
 void RApplication::init() {
     LOG_DEBUG(tag(), "RApplication intialization started");
 
-    mVulInstance = std::make_shared<RInstance>(mWindow->title(), mWindow.get());
-    if (!mVulInstance->isCreated()) {
+    mVkInstance = RCreator::create<RInstance>(mWindow->title(), mWindow);
+    if (!mVkInstance->isCreated()) {
         throw std::runtime_error("Failed to create Vulkan instance");
     }
     LOG_DEBUG(tag(), "RApplication intialization finished");
@@ -33,7 +33,7 @@ void RApplication::init() {
 
 void RApplication::cleanup() {
     LOG_DEBUG(tag(), "RApplication cleaning up");
-    mVulInstance = nullptr;
+    mVkInstance = nullptr;
     mWindow = nullptr;
 }
 

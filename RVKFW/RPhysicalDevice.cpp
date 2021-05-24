@@ -6,6 +6,7 @@
 #include "RSurface.h"
 #include "RWindow.h"
 #include "RSwapChain.h"
+#include "RCreator.h"
 
 #include <optional>
 #include <sstream>
@@ -16,11 +17,16 @@ const std::vector<const char*> RPhysicalDevice::deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-RPhysicalDevice::RPhysicalDevice(RInstance *instance, RSurface *surface, RWindow *window) :
-    mInstance{ instance }, mSurface{ surface }, mWindow{ window} {
+void RPhysicalDevice::create(std::shared_ptr<RInstance> instance,
+                             std::shared_ptr<RSurface> surface,
+                             std::shared_ptr<RWindow> window) {
+
+    mInstance = instance;
+    mSurface = surface;
+    mWindow = window;
 
     uint32_t deviceCount = 0;
-    vkEnumeratePhysicalDevices(mInstance->handle(), &deviceCount, nullptr);
+    vkEnumeratePhysicalDevices(instance->handle(), &deviceCount, nullptr);
 
     if (deviceCount == 0) {
         LOG_ERROR(tag(), "Failed to find GPU with Vulkan support");
@@ -28,7 +34,7 @@ RPhysicalDevice::RPhysicalDevice(RInstance *instance, RSurface *surface, RWindow
     }
 
     std::vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(mInstance->handle(), &deviceCount, devices.data());
+    vkEnumeratePhysicalDevices(instance->handle(), &deviceCount, devices.data());
 
     auto isDeviceWithGeometricShader = [this](VkPhysicalDevice device) {
         VkPhysicalDeviceProperties deviceProperties;
@@ -54,7 +60,7 @@ RPhysicalDevice::RPhysicalDevice(RInstance *instance, RSurface *surface, RWindow
     std::optional<uint32_t> graphicsFamily;
     std::optional<uint32_t> presentFamily;
 
-    auto isDeviceWithGraphicsCapabilities = [&graphicsFamily, &presentFamily, this](VkPhysicalDevice device) {
+    auto isDeviceWithGraphicsCapabilities = [&graphicsFamily, &presentFamily, this, surface](VkPhysicalDevice device) {
 
         uint32_t queueFamilyCount = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
@@ -68,7 +74,7 @@ RPhysicalDevice::RPhysicalDevice(RInstance *instance, RSurface *surface, RWindow
                 graphicsFamily = i;
             }
             VkBool32 presentSupport = 0;
-            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, mInstance->surface()->handle(), &presentSupport);
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface->handle(), &presentSupport);
             if (presentSupport) {
                 presentFamily = i;
             }
@@ -76,7 +82,7 @@ RPhysicalDevice::RPhysicalDevice(RInstance *instance, RSurface *surface, RWindow
             ++i;
         }
 
-        auto swapChainSupport = RSwapChain::querySwapChainSupport(device, mSurface->handle());
+        auto swapChainSupport = RSwapChain::querySwapChainSupport(device, surface->handle());
 
         return  graphicsFamily.has_value() && presentFamily.has_value() &&
                 checkDeviceExtensionSupport(device) && !swapChainSupport.formats.empty() &&
@@ -102,10 +108,12 @@ RPhysicalDevice::RPhysicalDevice(RInstance *instance, RSurface *surface, RWindow
     
     LOG_DEBUG(tag(), "Extensions : " << getAllExtensions(mPhysicalDevice));
 
-    mGraphicDevice = std::make_shared<RLogicalDevice>(this, graphicsFamily.value(), presentFamily.value());
-    mSwapChain = std::make_shared<RSwapChain>(this, mGraphicDevice.get(), mSurface, mWindow);
-    mSwapChain->create(graphicsFamily.value(), presentFamily.value());
+    mLogicalDevice = RCreator::create<RLogicalDevice>(shared_from_this(),
+                                                      graphicsFamily.value(), presentFamily.value());
 
+    mSwapChain = RCreator::create<RSwapChain>(shared_from_this(), mLogicalDevice,
+                                              surface, window, graphicsFamily.value(),
+                                              presentFamily.value());
 }
 
 std::string RPhysicalDevice::getAllExtensions(VkPhysicalDevice device) const {
@@ -140,7 +148,7 @@ bool RPhysicalDevice::checkDeviceExtensionSupport(VkPhysicalDevice device)  cons
 
 RPhysicalDevice::~RPhysicalDevice() {
     mSwapChain = nullptr;
-    mGraphicDevice = nullptr;
+    mLogicalDevice = nullptr;
 }
 
 }

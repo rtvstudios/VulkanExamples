@@ -1,6 +1,6 @@
 
-#ifndef VulInstance_h
-#define VulInstance_h
+#ifndef RInstance_h
+#define RInstance_h
 
 #include <string>
 #include <memory>
@@ -15,10 +15,12 @@ class RPhysicalDevice;
 class RSurface;
 class RWindow;
 
-class RInstance: private RNonCopyable {
+class RInstance: public std::enable_shared_from_this<RInstance>, private RNonCopyable {
 public:
-    RInstance(const std::string &appName, RWindow *window);
+    RInstance() = default;
     ~RInstance();
+
+    void create(const std::string &appName, std::shared_ptr<RWindow> window);
 
     bool isCreated() const {
         return mResult == VK_SUCCESS;

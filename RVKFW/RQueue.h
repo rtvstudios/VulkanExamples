@@ -1,6 +1,6 @@
 
-#ifndef VulQueue_h
-#define VulQueue_h
+#ifndef RQueue_h
+#define RQueue_h
 
 #include <string>
 #include <memory>
@@ -15,8 +15,10 @@ class RLogicalDevice;
 
 class RQueue: private RNonCopyable {
 public:
-    RQueue(RLogicalDevice *logicalDevice, uint32_t queueIndex);
+    RQueue() = default;
     ~RQueue();
+
+    void create(std::shared_ptr<RLogicalDevice> logicalDevice, uint32_t queueIndex);
 
     const char * tag() const {
         return "RQueue";
@@ -24,7 +26,7 @@ public:
 
 protected:
     VkQueue mQueue{ VK_NULL_HANDLE };
-    RLogicalDevice *mLogicalDevice{ nullptr };
+    std::weak_ptr<RLogicalDevice> mLogicalDevice;
 };
 
 }

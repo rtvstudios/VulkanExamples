@@ -5,7 +5,9 @@
 
 namespace rvkfw {
 
-RQueue::RQueue(RLogicalDevice *logicalDevice, uint32_t queueIndex) : mLogicalDevice{ logicalDevice } {
+void RQueue::create(std::shared_ptr<RLogicalDevice> logicalDevice, uint32_t queueIndex) {
+    mLogicalDevice = logicalDevice;
+
     vkGetDeviceQueue(logicalDevice->handle(), queueIndex, 0, &mQueue);
     if (mQueue == VK_NULL_HANDLE) {
         LOG_ERROR(tag(), "Could not get queue handle");

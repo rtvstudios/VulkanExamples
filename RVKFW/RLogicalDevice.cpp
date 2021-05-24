@@ -3,13 +3,17 @@
 #include "RPhysicalDevice.h"
 #include "RQueue.h"
 #include "RLogger.h"
+#include "RCreator.h"
 
 #include <set>
 
 namespace rvkfw {
 
-RLogicalDevice::RLogicalDevice(RPhysicalDevice *physicalDevice, uint32_t graphicsQueue, uint32_t presentQueue) :
-        mPhysicalDevice{physicalDevice} {
+void RLogicalDevice::create(std::shared_ptr<RPhysicalDevice> physicalDevice,
+                            uint32_t graphicsQueue,
+                            uint32_t presentQueue) {
+
+    mPhysicalDevice = physicalDevice;
 
     float queuePriority = 1.0f;
     std::set<uint32_t> uniqueQueueFamilies{graphicsQueue, presentQueue};
@@ -43,8 +47,8 @@ RLogicalDevice::RLogicalDevice(RPhysicalDevice *physicalDevice, uint32_t graphic
 
     LOG_DEBUG(tag(), "Logical Device Created graphicsQueue:" << graphicsQueue << " presentQueue: " << presentQueue);
 
-    mGraphicsQueue = std::make_shared<RQueue>(this, graphicsQueue);
-    mPresentQueue = std::make_shared<RQueue>(this, presentQueue);
+    mGraphicsQueue = RCreator::create<RQueue>(shared_from_this(), graphicsQueue);
+    mPresentQueue = RCreator::create<RQueue>(shared_from_this(), presentQueue);
 }
 
 RLogicalDevice::~RLogicalDevice() {

@@ -1,5 +1,5 @@
-#ifndef Logger_h
-#define Logger_h
+#ifndef RLogger_h
+#define RLogger_h
 
 #include <string>
 #include <sstream>

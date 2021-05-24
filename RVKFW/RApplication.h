@@ -1,6 +1,6 @@
 
-#ifndef Application_h
-#define Application_h
+#ifndef RApplication_h
+#define RApplication_h
 
 #include <string>
 #include <memory.h>
@@ -15,12 +15,12 @@ class RSurface;
 
 class RApplication: private RNonCopyable {
 public:
-    virtual RWindow* createWindow(const std::string &title);
+    virtual void create(const std::string &title);
 
     virtual void run();
 
-    RWindow* window() {
-        return mWindow.get();
+    std::shared_ptr<RWindow> window() {
+        return mWindow;
     }
 
     const char * tag() const {
@@ -38,7 +38,7 @@ protected:
     virtual void mainLoop();
 
     std::shared_ptr<RWindow> mWindow;
-    std::shared_ptr<RInstance> mVulInstance;
+    std::shared_ptr<RInstance> mVkInstance;
 };
 
 }

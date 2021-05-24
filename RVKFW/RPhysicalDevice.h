@@ -1,6 +1,6 @@
 
-#ifndef VulPhysicalDevice_h
-#define VulPhysicalDevice_h
+#ifndef RPhysicalDevice_h
+#define RPhysicalDevice_h
 
 #include <string>
 #include <memory>
@@ -19,12 +19,14 @@ class RSurface;
 class RWindow;
 class RSwapChain;
 
-class RPhysicalDevice: private RNonCopyable {
+class RPhysicalDevice: public std::enable_shared_from_this<RPhysicalDevice>, private RNonCopyable {
 public:
     static const std::vector<const char*> deviceExtensions;
 
-    RPhysicalDevice(RInstance *instance, RSurface *surface, RWindow *window);
+    RPhysicalDevice() = default;
     ~RPhysicalDevice();
+
+    void create(std::shared_ptr<RInstance> instance, std::shared_ptr<RSurface> surface, std::shared_ptr<RWindow> window);
 
     bool isCreated() const {
         return mPhysicalDevice != VK_NULL_HANDLE;
@@ -44,12 +46,14 @@ protected:
     
     std::string getAllExtensions(VkPhysicalDevice device) const;
 
-    RInstance *mInstance{ nullptr };
     VkResult mResult{ VK_NOT_READY };
-    RSurface *mSurface{ nullptr };
-    RWindow *mWindow{ nullptr };
     VkPhysicalDevice mPhysicalDevice{ VK_NULL_HANDLE };
-    std::shared_ptr<RLogicalDevice> mGraphicDevice;
+
+    std::weak_ptr<RInstance> mInstance;
+    std::weak_ptr<RSurface> mSurface;
+    std::weak_ptr<RWindow> mWindow;
+
+    std::shared_ptr<RLogicalDevice> mLogicalDevice;
     std::shared_ptr<RSwapChain> mSwapChain;
 };
 

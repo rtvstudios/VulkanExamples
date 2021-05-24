@@ -1,6 +1,6 @@
 
-#ifndef VulSurface_h
-#define VulSurface_h
+#ifndef RSurface_h
+#define RSurface_h
 
 #include "RNonCopyable.h"
 
@@ -14,8 +14,10 @@ class RWindow;
 
 class RSurface: private RNonCopyable {
 public:
-    RSurface(RInstance *vulInstance, RWindow *window);
+    RSurface() = default;
     ~RSurface();
+
+    void create(std::shared_ptr<RInstance> instance, std::shared_ptr<RWindow> window);
 
     VkSurfaceKHR handle() {
         return mSurface;
@@ -26,7 +28,7 @@ public:
     }
 
 protected:
-    RInstance *mVulInstance{ nullptr };
+    std::weak_ptr<RInstance> mInstance;
     VkSurfaceKHR mSurface{ VK_NULL_HANDLE };
 };
 

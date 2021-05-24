@@ -1,6 +1,6 @@
 
-#ifndef VulSwapChain_h
-#define VulSwapChain_h
+#ifndef RSwapChain_h
+#define RSwapChain_h
 
 #include "RNonCopyable.h"
 
@@ -25,11 +25,16 @@ public:
         std::vector<VkPresentModeKHR> presentModes;
     };
 
-    RSwapChain(RPhysicalDevice *physicalDevice, RLogicalDevice *logicalDevice, RSurface *surface, RWindow *window);
+    RSwapChain() = default;
 
     ~RSwapChain();
 
-    bool create(uint32_t graphicsFamily, uint32_t presentFamily);
+    bool create(std::shared_ptr<RPhysicalDevice> physicalDevice,
+                std::shared_ptr<RLogicalDevice> logicalDevice,
+                std::shared_ptr<RSurface> surface,
+                std::shared_ptr<RWindow> window,
+                uint32_t graphicsFamily, uint32_t presentFamily);
+
     bool destroy();
 
     const char * tag() const {
@@ -48,10 +53,11 @@ protected:
     VkExtent2D chooseSwapExtent();
 
     VkSwapchainKHR mSwapChain{ VK_NULL_HANDLE };
-    RPhysicalDevice *mPhysicalDevice{ nullptr };
-    RLogicalDevice *mLogicalDevice{nullptr};
-    RSurface *mSurface{ nullptr };
-    RWindow *mWindow{ nullptr };
+    
+    std::weak_ptr<RPhysicalDevice> mPhysicalDevice;
+    std::weak_ptr<RLogicalDevice> mLogicalDevice;
+    std::weak_ptr<RSurface> mSurface;
+    std::weak_ptr<RWindow> mWindow;
 
     SwapChainSupportDetails mSwapChainSupportDetails;
 

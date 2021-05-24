@@ -11,13 +11,12 @@
 
 class GLFWWindow: public rvkfw::RApplication {
 public:
-    GLFWWindow() {
-    }
+    GLFWWindow() {}
 };
 
 int main(int argc, const char * argv[]) {
     auto application = std::make_shared<GLFWWindow>();
-    application->createWindow("First Vulkan RWindow");
+    application->create("Hello Triangle");
     application->run();
     
     return 0;

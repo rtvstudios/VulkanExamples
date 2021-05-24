@@ -1,6 +1,6 @@
 
-#ifndef Window_h
-#define Window_h
+#ifndef RWindow_h
+#define RWindow_h
 
 #include "RNonCopyable.h"
 
@@ -11,7 +11,10 @@ namespace rvkfw {
 
 class RWindow: private RNonCopyable {
 public:
-    RWindow(const std::string &title, uint32_t width=800, uint32_t height=600);
+    RWindow() = default;
+
+    void create(const std::string &title, uint32_t width=800, uint32_t height=600);
+
     ~RWindow();
 
     bool shouldClose() {

@@ -3,10 +3,11 @@
 
 namespace rvkfw {
 
-RWindow::RWindow(const std::string &title, uint32_t width, uint32_t height) : mTitle{title},
-        mWidth{ width },
-        mHeight{ height } {
-            
+void RWindow::create(const std::string &title, uint32_t width, uint32_t height) {
+    mWidth = width;
+    mHeight = height;
+    mTitle = title;
+
     glfwInit();
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);

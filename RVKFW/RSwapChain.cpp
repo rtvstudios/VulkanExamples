@@ -9,23 +9,26 @@
 
 namespace rvkfw {
 
-RSwapChain::RSwapChain(RPhysicalDevice *device,
-                           RLogicalDevice *logicalDevice,
-                           RSurface *surface, RWindow *window)
-    : mPhysicalDevice{ device}, mLogicalDevice{ logicalDevice },
-      mSurface{ surface}, mWindow{ window} {
-}
-
 RSwapChain::~RSwapChain() {
     destroy();
 }
 
-bool RSwapChain::create(uint32_t graphicsFamily, uint32_t presentFamily) {
+bool RSwapChain::create(std::shared_ptr<RPhysicalDevice> physicalDevice,
+                        std::shared_ptr<RLogicalDevice> logicalDevice,
+                        std::shared_ptr<RSurface> surface,
+                        std::shared_ptr<RWindow> window,
+                        uint32_t graphicsFamily, uint32_t presentFamily) {
+
+    mPhysicalDevice = physicalDevice;
+    mLogicalDevice =  logicalDevice;
+    mSurface = surface;
+    mWindow = window;
+
     if (mCreated.exchange(true)) {
         return mCreated;
     }
 
-    mSwapChainSupportDetails = querySwapChainSupport(mPhysicalDevice->handle(), mSurface->handle());
+    mSwapChainSupportDetails = querySwapChainSupport(physicalDevice->handle(), surface->handle());
 
     mSurfaceFormat = chooseSwapSurfaceFormat();
     mPresentMode = chooseSwapPresentMode();
@@ -39,7 +42,7 @@ bool RSwapChain::create(uint32_t graphicsFamily, uint32_t presentFamily) {
 
     VkSwapchainCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    createInfo.surface = mSurface->handle();
+    createInfo.surface = surface->handle();
 
     createInfo.minImageCount = imageCount;
     createInfo.imageFormat = mSurfaceFormat.format;
@@ -67,15 +70,15 @@ bool RSwapChain::create(uint32_t graphicsFamily, uint32_t presentFamily) {
 
     createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-    if (vkCreateSwapchainKHR(mLogicalDevice->handle(), &createInfo, nullptr, &mSwapChain) != VK_SUCCESS) {
+    if (vkCreateSwapchainKHR(logicalDevice->handle(), &createInfo, nullptr, &mSwapChain) != VK_SUCCESS) {
         mCreated = false;
         LOG_ERROR(tag(), "Failed to create swap chain!");
         throw std::runtime_error("failed to create swap chain!");
     }
 
-    vkGetSwapchainImagesKHR(mLogicalDevice->handle(), mSwapChain, &imageCount, nullptr);
+    vkGetSwapchainImagesKHR(logicalDevice->handle(), mSwapChain, &imageCount, nullptr);
     mSwapChainImages.resize(imageCount);
-    vkGetSwapchainImagesKHR(mLogicalDevice->handle(), mSwapChain, &imageCount, mSwapChainImages.data());
+    vkGetSwapchainImagesKHR(logicalDevice->handle(), mSwapChain, &imageCount, mSwapChainImages.data());
 
     LOG_INFO(tag(), "Total Number of ImageView: " << imageCount);
 
@@ -97,7 +100,7 @@ bool RSwapChain::create(uint32_t graphicsFamily, uint32_t presentFamily) {
         createInfo.subresourceRange.baseArrayLayer = 0;
         createInfo.subresourceRange.layerCount = 1;
 
-        if (vkCreateImageView(mLogicalDevice->handle(), &createInfo, nullptr, &mSwapChainImageViews[i]) != VK_SUCCESS) {
+        if (vkCreateImageView(logicalDevice->handle(), &createInfo, nullptr, &mSwapChainImageViews[i]) != VK_SUCCESS) {
             LOG_ERROR(tag(), "Failed to create image views!");
             throw std::runtime_error("failed to create image views!");
         }
@@ -105,16 +108,19 @@ bool RSwapChain::create(uint32_t graphicsFamily, uint32_t presentFamily) {
 }
 
 bool RSwapChain::destroy() {
-    for (auto imageView : mSwapChainImageViews) {
-        vkDestroyImageView(mLogicalDevice->handle(), imageView, nullptr);
+    if (auto logicalDevice = mLogicalDevice.lock()) {
+        for (auto imageView : mSwapChainImageViews) {
+            vkDestroyImageView(logicalDevice->handle(), imageView, nullptr);
+        }
+
+        if (mSwapChain != VK_NULL_HANDLE) {
+            vkDestroySwapchainKHR(logicalDevice->handle(), mSwapChain, nullptr);
+        }
     }
 
     mSwapChainImages.clear();
     mSwapChainImageViews.clear();
 
-    if (mSwapChain != VK_NULL_HANDLE) {
-        vkDestroySwapchainKHR(mLogicalDevice->handle(), mSwapChain, nullptr);
-    }
     mCreated = false;
 }
 
@@ -172,13 +178,19 @@ VkPresentModeKHR RSwapChain::chooseSwapPresentMode() {
 }
 
 VkExtent2D RSwapChain::chooseSwapExtent() {
+    auto window = mWindow.lock();
+    if (!window) {
+        return {};
+    }
+
     auto capabilities = mSwapChainSupportDetails.capabilities;
     if (capabilities.currentExtent.width != UINT32_MAX) {
         LOG_INFO(tag(), "chooseSwapExtent using width: " << capabilities.currentExtent.width <<
                         " height: " << capabilities.currentExtent.height);
         return capabilities.currentExtent;
     }
-    VkExtent2D actualExtent = {mWindow->height(), mWindow->width()};
+
+    VkExtent2D actualExtent = {window->height(), window->width()};
     actualExtent.width = std::max(capabilities.minImageExtent.width,
                                   std::min(capabilities.maxImageExtent.width,
                                            actualExtent.width));
