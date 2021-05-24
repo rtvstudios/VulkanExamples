@@ -8,6 +8,10 @@
 namespace rvkfw {
 
 void RInstance::create(const std::string &appName, std::shared_ptr<RWindow> window) {
+    if (mCreated.exchange(true)) {
+        return;
+    }
+
     mAppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     mAppInfo.pApplicationName = appName.c_str();
     mAppInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);

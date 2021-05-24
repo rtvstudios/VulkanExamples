@@ -5,7 +5,7 @@
 #include <string>
 #include <memory.h>
 
-#include "RNonCopyable.h"
+#include "RObject.h"
 
 namespace rvkfw {
 
@@ -13,7 +13,7 @@ class RWindow;
 class RInstance;
 class RSurface;
 
-class RApplication: private RNonCopyable {
+class RApplication: public RObject {
 public:
     virtual void create(const std::string &title);
 
@@ -23,7 +23,7 @@ public:
         return mWindow;
     }
 
-    const char * tag() const {
+    const char * tag() const override {
         return "RApplication";
     }
 

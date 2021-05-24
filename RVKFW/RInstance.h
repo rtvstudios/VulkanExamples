@@ -6,8 +6,7 @@
 #include <memory>
 #include <vector>
 
-#include "RNonCopyable.h"
-#include <GLFW/glfw3.h>
+#include "RObject.h"
 
 namespace rvkfw {
 
@@ -15,7 +14,7 @@ class RPhysicalDevice;
 class RSurface;
 class RWindow;
 
-class RInstance: public std::enable_shared_from_this<RInstance>, private RNonCopyable {
+class RInstance: public std::enable_shared_from_this<RInstance>, public RObject {
 public:
     RInstance() = default;
     ~RInstance();
@@ -32,7 +31,7 @@ public:
         return mInstance;
     }
 
-    const char * tag() const {
+    const char * tag() const override {
         return "RInstance";
     }
 

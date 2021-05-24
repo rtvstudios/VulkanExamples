@@ -9,7 +9,11 @@
 namespace rvkfw {
 
 void RShaderModule::create(std::shared_ptr<RLogicalDevice> device, const std::string &shaderFile) {
-    mDevice = device;
+    if (mCreated.exchange(true)) {
+        return;
+    }
+
+    mLogicalDevice = device;
 
     auto code = readFile(shaderFile);
 
@@ -22,10 +26,12 @@ void RShaderModule::create(std::shared_ptr<RLogicalDevice> device, const std::st
         LOG_ERROR(tag(), "failed to create shader module!");
         throw std::runtime_error("failed to create shader module!");
     }
+
+    LOG_DEBUG(tag(), "Shader module is created");
 }
 
 RShaderModule::~RShaderModule() {
-    if (auto device = mDevice.lock()) {
+    if (auto device = mLogicalDevice.lock()) {
         if (mModule != VK_NULL_HANDLE) {
             vkDestroyShaderModule(device->handle(), mModule, nullptr);
         }

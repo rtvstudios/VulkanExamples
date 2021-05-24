@@ -2,17 +2,14 @@
 #ifndef RSurface_h
 #define RSurface_h
 
-#include "RNonCopyable.h"
-
-#include <string>
-#include <GLFW/glfw3.h>
+#include "RObject.h"
 
 namespace rvkfw {
 
 class RInstance;
 class RWindow;
 
-class RSurface: private RNonCopyable {
+class RSurface: public RObject {
 public:
     RSurface() = default;
     ~RSurface();
@@ -23,7 +20,7 @@ public:
         return mSurface;
     }
 
-    const char * tag() const {
+    const char * tag() const override {
         return "RSurface";
     }
 

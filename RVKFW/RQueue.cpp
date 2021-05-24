@@ -6,6 +6,10 @@
 namespace rvkfw {
 
 void RQueue::create(std::shared_ptr<RLogicalDevice> logicalDevice, uint32_t queueIndex) {
+    if (mCreated.exchange(true)) {
+        return;
+    }
+
     mLogicalDevice = logicalDevice;
 
     vkGetDeviceQueue(logicalDevice->handle(), queueIndex, 0, &mQueue);

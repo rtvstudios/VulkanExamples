@@ -12,6 +12,9 @@ namespace rvkfw {
 void RLogicalDevice::create(std::shared_ptr<RPhysicalDevice> physicalDevice,
                             uint32_t graphicsQueue,
                             uint32_t presentQueue) {
+    if (mCreated.exchange(true)) {
+        return;
+    }
 
     mPhysicalDevice = physicalDevice;
 

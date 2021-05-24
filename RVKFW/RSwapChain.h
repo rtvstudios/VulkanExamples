@@ -2,13 +2,7 @@
 #ifndef RSwapChain_h
 #define RSwapChain_h
 
-#include "RNonCopyable.h"
-
-#include <string>
-#include <vector>
-#include <set>
-#include <atomic>
-#include <GLFW/glfw3.h>
+#include "RObject.h"
 
 namespace rvkfw {
 
@@ -17,7 +11,7 @@ class RSurface;
 class RWindow;
 class RLogicalDevice;
 
-class RSwapChain: private RNonCopyable {
+class RSwapChain: public RObject {
 public:
     struct SwapChainSupportDetails {
         VkSurfaceCapabilitiesKHR capabilities;
@@ -37,12 +31,28 @@ public:
 
     bool destroy();
 
-    const char * tag() const {
+    const char * tag() const override {
         return "RSwapChain";
     }
 
     VkSwapchainKHR handle() {
         return mSwapChain;
+    }
+
+    VkExtent2D swapExtent() const {
+        return mSwapExtent;
+    }
+
+    VkSurfaceFormatKHR surfaceFormat() const {
+        return mSurfaceFormat;
+    }
+
+    const std::vector<VkImageView> &imageViews() const {
+        return mSwapChainImageViews;
+    }
+
+    const std::vector<VkImage> &images() const {
+        return mSwapChainImages;
     }
 
     static SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
@@ -53,7 +63,7 @@ protected:
     VkExtent2D chooseSwapExtent();
 
     VkSwapchainKHR mSwapChain{ VK_NULL_HANDLE };
-    
+
     std::weak_ptr<RPhysicalDevice> mPhysicalDevice;
     std::weak_ptr<RLogicalDevice> mLogicalDevice;
     std::weak_ptr<RSurface> mSurface;

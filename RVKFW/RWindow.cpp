@@ -4,6 +4,10 @@
 namespace rvkfw {
 
 void RWindow::create(const std::string &title, uint32_t width, uint32_t height) {
+    if (mCreated.exchange(true)) {
+        return;
+    }
+
     mWidth = width;
     mHeight = height;
     mTitle = title;

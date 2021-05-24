@@ -6,22 +6,21 @@
 #include <memory>
 #include <vector>
 
-#include "RNonCopyable.h"
-#include <GLFW/glfw3.h>
+#include "RObject.h"
 
 namespace rvkfw {
 
 class RPhysicalDevice;
 class RQueue;
 
-class RLogicalDevice: public std::enable_shared_from_this<RLogicalDevice>, private RNonCopyable {
+class RLogicalDevice: public std::enable_shared_from_this<RLogicalDevice>, public RObject {
 public:
     RLogicalDevice() = default;
     ~RLogicalDevice();
 
     void create(std::shared_ptr<RPhysicalDevice> physicalDevice, uint32_t graphicsQueue, uint32_t presentQueue);
 
-    const char * tag() const {
+    const char * tag() const override {
         return "RLogicalDevice";
     }
 

@@ -6,10 +6,7 @@
 #include <memory>
 #include <vector>
 
-#include "RNonCopyable.h"
-#include <GLFW/glfw3.h>
-#include <vector>
-#include <set>
+#include "RObject.h"
 
 namespace rvkfw {
 
@@ -19,7 +16,7 @@ class RSurface;
 class RWindow;
 class RSwapChain;
 
-class RPhysicalDevice: public std::enable_shared_from_this<RPhysicalDevice>, private RNonCopyable {
+class RPhysicalDevice: public std::enable_shared_from_this<RPhysicalDevice>, public RObject {
 public:
     static const std::vector<const char*> deviceExtensions;
 
@@ -36,7 +33,7 @@ public:
         return mPhysicalDevice;
     }
 
-    const char * tag() const {
+    const char * tag() const override {
         return "RPhysicalDevice";
     }
 

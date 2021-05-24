@@ -2,14 +2,11 @@
 #ifndef RWindow_h
 #define RWindow_h
 
-#include "RNonCopyable.h"
-
-#include <string>
-#include <GLFW/glfw3.h>
+#include "RObject.h"
 
 namespace rvkfw {
 
-class RWindow: private RNonCopyable {
+class RWindow: public RObject {
 public:
     RWindow() = default;
 
@@ -35,6 +32,10 @@ public:
 
     uint32_t height() const {
         return mHeight;
+    }
+
+    const char * tag() const override {
+        return "RWindow";
     }
 
 protected:

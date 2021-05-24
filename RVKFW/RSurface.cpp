@@ -9,6 +9,10 @@
 namespace rvkfw {
 
 void RSurface::create(std::shared_ptr<RInstance> instance, std::shared_ptr<RWindow> window) {
+    if (mCreated.exchange(true)) {
+        return;
+    }
+
     mInstance = instance;
 
     if (glfwCreateWindowSurface(instance->handle(), window->handle(), nullptr, &mSurface) != VK_SUCCESS) {

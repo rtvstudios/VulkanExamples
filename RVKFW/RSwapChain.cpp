@@ -19,6 +19,10 @@ bool RSwapChain::create(std::shared_ptr<RPhysicalDevice> physicalDevice,
                         std::shared_ptr<RWindow> window,
                         uint32_t graphicsFamily, uint32_t presentFamily) {
 
+    if (mCreated.exchange(true)) {
+        return;
+    }
+
     mPhysicalDevice = physicalDevice;
     mLogicalDevice =  logicalDevice;
     mSurface = surface;

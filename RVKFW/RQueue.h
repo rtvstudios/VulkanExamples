@@ -6,21 +6,20 @@
 #include <memory>
 #include <vector>
 
-#include "RNonCopyable.h"
-#include <GLFW/glfw3.h>
+#include "RObject.h"
 
 namespace rvkfw {
 
 class RLogicalDevice;
 
-class RQueue: private RNonCopyable {
+class RQueue: public RObject {
 public:
     RQueue() = default;
     ~RQueue();
 
     void create(std::shared_ptr<RLogicalDevice> logicalDevice, uint32_t queueIndex);
 
-    const char * tag() const {
+    const char * tag() const override {
         return "RQueue";
     }
 

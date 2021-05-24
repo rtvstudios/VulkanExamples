@@ -20,6 +20,9 @@ const std::vector<const char*> RPhysicalDevice::deviceExtensions = {
 void RPhysicalDevice::create(std::shared_ptr<RInstance> instance,
                              std::shared_ptr<RSurface> surface,
                              std::shared_ptr<RWindow> window) {
+    if (mCreated.exchange(true)) {
+        return;
+    }
 
     mInstance = instance;
     mSurface = surface;

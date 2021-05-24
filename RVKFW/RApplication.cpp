@@ -8,6 +8,10 @@
 namespace rvkfw {
 
 void RApplication::create(const std::string &title) {
+    if (mCreated.exchange(true)) {
+        return;
+    }
+    
     mWindow = RCreator::create<RWindow>(title);
 }
 
