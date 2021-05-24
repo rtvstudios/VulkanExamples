@@ -1,22 +1,22 @@
 
-#include "VulPhysicalDevice.h"
-#include "VulInstance.h"
-#include "Logger.h"
-#include "VulLogicalDevice.h"
-#include "VulSurface.h"
-#include "Window.h"
-#include "VulSwapChain.h"
+#include "RPhysicalDevice.h"
+#include "RInstance.h"
+#include "RLogger.h"
+#include "RLogicalDevice.h"
+#include "RSurface.h"
+#include "RWindow.h"
+#include "RSwapChain.h"
 
 #include <optional>
 #include <sstream>
 
 namespace rtvvulfw {
 
-const std::vector<const char*> VulPhysicalDevice::deviceExtensions = {
+const std::vector<const char*> RPhysicalDevice::deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-VulPhysicalDevice::VulPhysicalDevice(VulInstance *instance, VulSurface *surface, Window *window) :
+RPhysicalDevice::RPhysicalDevice(RInstance *instance, RSurface *surface, RWindow *window) :
     mInstance{ instance }, mSurface{ surface }, mWindow{ window} {
 
     uint32_t deviceCount = 0;
@@ -76,7 +76,7 @@ VulPhysicalDevice::VulPhysicalDevice(VulInstance *instance, VulSurface *surface,
             ++i;
         }
 
-        auto swapChainSupport = VulSwapChain::querySwapChainSupport(device, mSurface->handle());
+        auto swapChainSupport = RSwapChain::querySwapChainSupport(device, mSurface->handle());
 
         return  graphicsFamily.has_value() && presentFamily.has_value() &&
                 checkDeviceExtensionSupport(device) && !swapChainSupport.formats.empty() &&
@@ -102,13 +102,13 @@ VulPhysicalDevice::VulPhysicalDevice(VulInstance *instance, VulSurface *surface,
     
     LOG_DEBUG(tag(), "Extensions : " << getAllExtensions(mPhysicalDevice));
 
-    mGraphicDevice = std::make_shared<VulLogicalDevice>(this, graphicsFamily.value(), presentFamily.value());
-    mSwapChain = std::make_shared<VulSwapChain>(this, mGraphicDevice.get(), mSurface, mWindow);
+    mGraphicDevice = std::make_shared<RLogicalDevice>(this, graphicsFamily.value(), presentFamily.value());
+    mSwapChain = std::make_shared<RSwapChain>(this, mGraphicDevice.get(), mSurface, mWindow);
     mSwapChain->create(graphicsFamily.value(), presentFamily.value());
 
 }
 
-std::string VulPhysicalDevice::getAllExtensions(VkPhysicalDevice device) const {
+std::string RPhysicalDevice::getAllExtensions(VkPhysicalDevice device) const {
     uint32_t extensionCount;
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
     std::vector<VkExtensionProperties> availableExtensions(extensionCount);
@@ -121,7 +121,7 @@ std::string VulPhysicalDevice::getAllExtensions(VkPhysicalDevice device) const {
     return str.str();
 }
 
-bool VulPhysicalDevice::checkDeviceExtensionSupport(VkPhysicalDevice device)  const {
+bool RPhysicalDevice::checkDeviceExtensionSupport(VkPhysicalDevice device)  const {
     uint32_t extensionCount;
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
 
@@ -138,7 +138,7 @@ bool VulPhysicalDevice::checkDeviceExtensionSupport(VkPhysicalDevice device)  co
     return requiredExtensions.empty();
 }
 
-VulPhysicalDevice::~VulPhysicalDevice() {
+RPhysicalDevice::~RPhysicalDevice() {
     mSwapChain = nullptr;
     mGraphicDevice = nullptr;
 }

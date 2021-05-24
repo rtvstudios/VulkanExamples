@@ -7,9 +7,9 @@
 
 #include <iostream>
 
-#include "Application.h"
+#include "RApplication.h"
 
-class GLFWWindow: public rtvvulfw::Application {
+class GLFWWindow: public rtvvulfw::RApplication {
 public:
     GLFWWindow() {
     }
@@ -17,7 +17,7 @@ public:
 
 int main(int argc, const char * argv[]) {
     auto application = std::make_shared<GLFWWindow>();
-    application->createWindow("First Vulkan Window");
+    application->createWindow("First Vulkan RWindow");
     application->run();
     
     return 0;

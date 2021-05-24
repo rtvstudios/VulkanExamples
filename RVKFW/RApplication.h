@@ -5,31 +5,31 @@
 #include <string>
 #include <memory.h>
 
-#include "NonCopyable.h"
+#include "RNonCopyable.h"
 
 namespace rtvvulfw {
 
-class Window;
-class VulInstance;
-class VulSurface;
+class RWindow;
+class RInstance;
+class RSurface;
 
-class Application: private NonCopyable {
+class RApplication: private RNonCopyable {
 public:
-    virtual Window* createWindow(const std::string &title);
+    virtual RWindow* createWindow(const std::string &title);
 
     virtual void run();
 
-    Window* window() {
+    RWindow* window() {
         return mWindow.get();
     }
 
     const char * tag() const {
-        return "Application";
+        return "RApplication";
     }
 
 protected:
-    Application() = default;
-    ~Application() {
+    RApplication() = default;
+    ~RApplication() {
         cleanup();
     }
 
@@ -37,8 +37,8 @@ protected:
     virtual void cleanup();
     virtual void mainLoop();
 
-    std::shared_ptr<Window> mWindow;
-    std::shared_ptr<VulInstance> mVulInstance;
+    std::shared_ptr<RWindow> mWindow;
+    std::shared_ptr<RInstance> mVulInstance;
 };
 
 }

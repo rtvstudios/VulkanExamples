@@ -1,19 +1,19 @@
 
-#include "Application.h"
-#include "Window.h"
-#include "VulInstance.h"
-#include "Logger.h"
+#include "RApplication.h"
+#include "RWindow.h"
+#include "RInstance.h"
+#include "RLogger.h"
 
 namespace rtvvulfw {
 
-Window* Application::createWindow(const std::string &title) {
-    mWindow = std::make_shared<Window>(title);
+RWindow* RApplication::createWindow(const std::string &title) {
+    mWindow = std::make_shared<RWindow>(title);
     return mWindow.get();
 }
 
-void Application::run() {
+void RApplication::run() {
     if (!mWindow) {
-        throw std::logic_error("Create Window First");
+        throw std::logic_error("Create RWindow First");
     }
 
     init();
@@ -21,29 +21,29 @@ void Application::run() {
     cleanup();
 }
 
-void Application::init() {
-    LOG_DEBUG(tag(), "Application intialization started");
+void RApplication::init() {
+    LOG_DEBUG(tag(), "RApplication intialization started");
 
-    mVulInstance = std::make_shared<VulInstance>(mWindow->title(), mWindow.get());
+    mVulInstance = std::make_shared<RInstance>(mWindow->title(), mWindow.get());
     if (!mVulInstance->isCreated()) {
         throw std::runtime_error("Failed to create Vulkan instance");
     }
-    LOG_DEBUG(tag(), "Application intialization finished");
+    LOG_DEBUG(tag(), "RApplication intialization finished");
 }
 
-void Application::cleanup() {
-    LOG_DEBUG(tag(), "Application cleaning up");
+void RApplication::cleanup() {
+    LOG_DEBUG(tag(), "RApplication cleaning up");
     mVulInstance = nullptr;
     mWindow = nullptr;
 }
 
-void Application::mainLoop() {
-    LOG_DEBUG(tag(), "Application mainLoop started");
+void RApplication::mainLoop() {
+    LOG_DEBUG(tag(), "RApplication mainLoop started");
 
     while(!mWindow->shouldClose()) {
         glfwPollEvents();
     }
-    LOG_DEBUG(tag(), "Application mainLoop finished");
+    LOG_DEBUG(tag(), "RApplication mainLoop finished");
 }
 
 }

@@ -6,21 +6,21 @@
 #include <memory>
 #include <vector>
 
-#include "NonCopyable.h"
+#include "RNonCopyable.h"
 #include <GLFW/glfw3.h>
 
 namespace rtvvulfw {
 
-class VulPhysicalDevice;
-class VulQueue;
+class RPhysicalDevice;
+class RQueue;
 
-class VulLogicalDevice: private NonCopyable {
+class RLogicalDevice: private RNonCopyable {
 public:
-    VulLogicalDevice(VulPhysicalDevice *physicalDevice, uint32_t graphicsQueue, uint32_t presentQueue);
-    ~VulLogicalDevice();
+    RLogicalDevice(RPhysicalDevice *physicalDevice, uint32_t graphicsQueue, uint32_t presentQueue);
+    ~RLogicalDevice();
 
     const char * tag() const {
-        return "VulLogicalDevice";
+        return "RLogicalDevice";
     }
 
     VkDevice handle() {
@@ -31,19 +31,19 @@ public:
         return mDevice != VK_NULL_HANDLE;
     }
 
-    VulQueue * graphicsQueue() {
+    RQueue * graphicsQueue() {
         return mGraphicsQueue.get();
     }
 
-    VulQueue * presentQueue() {
+    RQueue * presentQueue() {
         return mPresentQueue.get();
     }
 
 protected:
     VkDevice mDevice{ VK_NULL_HANDLE };
-    VulPhysicalDevice *mPhysicalDevice{ nullptr };
-    std::shared_ptr<VulQueue> mGraphicsQueue;
-    std::shared_ptr<VulQueue> mPresentQueue;
+    RPhysicalDevice *mPhysicalDevice{ nullptr };
+    std::shared_ptr<RQueue> mGraphicsQueue;
+    std::shared_ptr<RQueue> mPresentQueue;
 };
 
 }

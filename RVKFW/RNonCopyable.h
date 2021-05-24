@@ -3,11 +3,11 @@
 
 namespace rtvvulfw {
 
-class NonCopyable {
+class RNonCopyable {
 public:
-    NonCopyable(const NonCopyable &) = delete;
-    NonCopyable& operator=(const NonCopyable &) = delete;
-    NonCopyable() = default;
+    RNonCopyable(const RNonCopyable &) = delete;
+    RNonCopyable& operator=(const RNonCopyable &) = delete;
+    RNonCopyable() = default;
 };
 
 }

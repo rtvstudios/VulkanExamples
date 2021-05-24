@@ -1,26 +1,26 @@
 
-#include "VulSwapChain.h"
-#include "VulPhysicalDevice.h"
-#include "VulInstance.h"
-#include "Logger.h"
-#include "VulSurface.h"
-#include "Window.h"
-#include "VulLogicalDevice.h"
+#include "RSwapChain.h"
+#include "RPhysicalDevice.h"
+#include "RInstance.h"
+#include "RLogger.h"
+#include "RSurface.h"
+#include "RWindow.h"
+#include "RLogicalDevice.h"
 
 namespace rtvvulfw {
 
-VulSwapChain::VulSwapChain(VulPhysicalDevice *device,
-                           VulLogicalDevice *logicalDevice,
-                           VulSurface *surface, Window *window)
+RSwapChain::RSwapChain(RPhysicalDevice *device,
+                           RLogicalDevice *logicalDevice,
+                           RSurface *surface, RWindow *window)
     : mPhysicalDevice{ device}, mLogicalDevice{ logicalDevice },
       mSurface{ surface}, mWindow{ window} {
 }
 
-VulSwapChain::~VulSwapChain() {
+RSwapChain::~RSwapChain() {
     destroy();
 }
 
-bool VulSwapChain::create(uint32_t graphicsFamily, uint32_t presentFamily) {
+bool RSwapChain::create(uint32_t graphicsFamily, uint32_t presentFamily) {
     if (mCreated.exchange(true)) {
         return mCreated;
     }
@@ -104,7 +104,7 @@ bool VulSwapChain::create(uint32_t graphicsFamily, uint32_t presentFamily) {
     }
 }
 
-bool VulSwapChain::destroy() {
+bool RSwapChain::destroy() {
     for (auto imageView : mSwapChainImageViews) {
         vkDestroyImageView(mLogicalDevice->handle(), imageView, nullptr);
     }
@@ -118,7 +118,7 @@ bool VulSwapChain::destroy() {
     mCreated = false;
 }
 
-VulSwapChain::SwapChainSupportDetails VulSwapChain::querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface) {
+RSwapChain::SwapChainSupportDetails RSwapChain::querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface) {
     SwapChainSupportDetails details;
 
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
@@ -144,7 +144,7 @@ VulSwapChain::SwapChainSupportDetails VulSwapChain::querySwapChainSupport(VkPhys
     return details;
 }
 
-VkSurfaceFormatKHR VulSwapChain::chooseSwapSurfaceFormat() {
+VkSurfaceFormatKHR RSwapChain::chooseSwapSurfaceFormat() {
 
     for (const auto& availableFormat : mSwapChainSupportDetails.formats) {
         if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
@@ -159,7 +159,7 @@ VkSurfaceFormatKHR VulSwapChain::chooseSwapSurfaceFormat() {
     return mSwapChainSupportDetails.formats[0];
 }
 
-VkPresentModeKHR VulSwapChain::chooseSwapPresentMode() {
+VkPresentModeKHR RSwapChain::chooseSwapPresentMode() {
     for (const auto& availablePresentMode : mSwapChainSupportDetails.presentModes) {
         if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
             LOG_INFO(tag(), "Presentation Mode: VK_PRESENT_MODE_MAILBOX_KHR");
@@ -171,7 +171,7 @@ VkPresentModeKHR VulSwapChain::chooseSwapPresentMode() {
     return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-VkExtent2D VulSwapChain::chooseSwapExtent() {
+VkExtent2D RSwapChain::chooseSwapExtent() {
     auto capabilities = mSwapChainSupportDetails.capabilities;
     if (capabilities.currentExtent.width != UINT32_MAX) {
         LOG_INFO(tag(), "chooseSwapExtent using width: " << capabilities.currentExtent.width <<

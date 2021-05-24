@@ -6,19 +6,19 @@
 #include <memory>
 #include <vector>
 
-#include "NonCopyable.h"
+#include "RNonCopyable.h"
 #include <GLFW/glfw3.h>
 
 namespace rtvvulfw {
 
-class VulPhysicalDevice;
-class VulSurface;
-class Window;
+class RPhysicalDevice;
+class RSurface;
+class RWindow;
 
-class VulInstance: private NonCopyable {
+class RInstance: private RNonCopyable {
 public:
-    VulInstance(const std::string &appName, Window *window);
-    ~VulInstance();
+    RInstance(const std::string &appName, RWindow *window);
+    ~RInstance();
 
     bool isCreated() const {
         return mResult == VK_SUCCESS;
@@ -31,10 +31,10 @@ public:
     }
 
     const char * tag() const {
-        return "VulInstance";
+        return "RInstance";
     }
 
-    VulSurface * surface() {
+    RSurface * surface() {
         return mSurface.get();
     }
 
@@ -45,8 +45,8 @@ protected:
     VkApplicationInfo mAppInfo{};
     VkInstanceCreateInfo mCreateInfo{};
 
-    std::shared_ptr<VulPhysicalDevice> mPhysicalDevice;
-    std::shared_ptr<VulSurface> mSurface;
+    std::shared_ptr<RPhysicalDevice> mPhysicalDevice;
+    std::shared_ptr<RSurface> mSurface;
 
     std::vector<const char*> mValidationLayers = { "VK_LAYER_KHRONOS_validation" };
 

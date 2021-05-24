@@ -6,25 +6,25 @@
 #include <memory>
 #include <vector>
 
-#include "NonCopyable.h"
+#include "RNonCopyable.h"
 #include <GLFW/glfw3.h>
 
 namespace rtvvulfw {
 
-class VulLogicalDevice;
+class RLogicalDevice;
 
-class VulQueue: private NonCopyable {
+class RQueue: private RNonCopyable {
 public:
-    VulQueue(VulLogicalDevice *logicalDevice, uint32_t queueIndex);
-    ~VulQueue();
+    RQueue(RLogicalDevice *logicalDevice, uint32_t queueIndex);
+    ~RQueue();
 
     const char * tag() const {
-        return "VulQueue";
+        return "RQueue";
     }
 
 protected:
     VkQueue mQueue{ VK_NULL_HANDLE };
-    VulLogicalDevice *mLogicalDevice{ nullptr };
+    RLogicalDevice *mLogicalDevice{ nullptr };
 };
 
 }

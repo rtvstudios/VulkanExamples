@@ -1,9 +1,9 @@
 
-#include "Window.h"
+#include "RWindow.h"
 
 namespace rtvvulfw {
 
-Window::Window(const std::string &title, uint32_t width, uint32_t height) : mTitle{title},
+RWindow::RWindow(const std::string &title, uint32_t width, uint32_t height) : mTitle{title},
         mWidth{ width },
         mHeight{ height } {
             
@@ -15,7 +15,7 @@ Window::Window(const std::string &title, uint32_t width, uint32_t height) : mTit
     mWindow = glfwCreateWindow(mWidth, mHeight, mTitle.c_str(), nullptr, nullptr);
 }
 
-Window::~Window() {
+RWindow::~RWindow() {
     if (mWindow != nullptr) {
         glfwDestroyWindow(mWindow);
     }

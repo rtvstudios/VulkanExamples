@@ -1,12 +1,12 @@
 
-#include "VulInstance.h"
-#include "VulPhysicalDevice.h"
-#include "Logger.h"
-#include "VulSurface.h"
+#include "RInstance.h"
+#include "RPhysicalDevice.h"
+#include "RLogger.h"
+#include "RSurface.h"
 
 namespace rtvvulfw {
 
-VulInstance::VulInstance(const std::string &appName, Window *window) {
+RInstance::RInstance(const std::string &appName, RWindow *window) {
     mAppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     mAppInfo.pApplicationName = appName.c_str();
     mAppInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -40,15 +40,15 @@ VulInstance::VulInstance(const std::string &appName, Window *window) {
     mResult = vkCreateInstance(&mCreateInfo, nullptr, &mInstance);
 
     if (isCreated()) {
-        mSurface = std::make_shared<VulSurface>(this, window);
+        mSurface = std::make_shared<RSurface>(this, window);
 
-        mPhysicalDevice = std::make_shared<VulPhysicalDevice>(this, mSurface.get(), window);
+        mPhysicalDevice = std::make_shared<RPhysicalDevice>(this, mSurface.get(), window);
     } else {
         LOG_ERROR(tag(), "Could not create Vulkan Instance");
     }
 }
 
-VulInstance::~VulInstance() {
+RInstance::~RInstance() {
     mSurface = nullptr;
     mPhysicalDevice = nullptr;
     if (isCreated()) {
@@ -56,7 +56,7 @@ VulInstance::~VulInstance() {
     }
 }
 
-bool VulInstance::isValidationLayerAvailable() const {
+bool RInstance::isValidationLayerAvailable() const {
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 

@@ -1,14 +1,14 @@
 
-#include "VulLogicalDevice.h"
-#include "VulPhysicalDevice.h"
-#include "VulQueue.h"
-#include "Logger.h"
+#include "RLogicalDevice.h"
+#include "RPhysicalDevice.h"
+#include "RQueue.h"
+#include "RLogger.h"
 
 #include <set>
 
 namespace rtvvulfw {
 
-VulLogicalDevice::VulLogicalDevice(VulPhysicalDevice *physicalDevice, uint32_t graphicsQueue, uint32_t presentQueue) :
+RLogicalDevice::RLogicalDevice(RPhysicalDevice *physicalDevice, uint32_t graphicsQueue, uint32_t presentQueue) :
         mPhysicalDevice{physicalDevice} {
 
     float queuePriority = 1.0f;
@@ -34,8 +34,8 @@ VulLogicalDevice::VulLogicalDevice(VulPhysicalDevice *physicalDevice, uint32_t g
 
     createInfo.pEnabledFeatures = &deviceFeatures;
 
-    createInfo.enabledExtensionCount = VulPhysicalDevice::deviceExtensions.size();
-    createInfo.ppEnabledExtensionNames = VulPhysicalDevice::deviceExtensions.data();
+    createInfo.enabledExtensionCount = RPhysicalDevice::deviceExtensions.size();
+    createInfo.ppEnabledExtensionNames = RPhysicalDevice::deviceExtensions.data();
 
     if (vkCreateDevice(physicalDevice->handle(), &createInfo, nullptr, &mDevice) != VK_SUCCESS) {
         throw std::runtime_error("failed to create logical device!");
@@ -43,11 +43,11 @@ VulLogicalDevice::VulLogicalDevice(VulPhysicalDevice *physicalDevice, uint32_t g
 
     LOG_DEBUG(tag(), "Logical Device Created graphicsQueue:" << graphicsQueue << " presentQueue: " << presentQueue);
 
-    mGraphicsQueue = std::make_shared<VulQueue>(this, graphicsQueue);
-    mPresentQueue = std::make_shared<VulQueue>(this, presentQueue);
+    mGraphicsQueue = std::make_shared<RQueue>(this, graphicsQueue);
+    mPresentQueue = std::make_shared<RQueue>(this, presentQueue);
 }
 
-VulLogicalDevice::~VulLogicalDevice() {
+RLogicalDevice::~RLogicalDevice() {
     mGraphicsQueue = nullptr;
     mPresentQueue = nullptr;
     if (mDevice != VK_NULL_HANDLE) {

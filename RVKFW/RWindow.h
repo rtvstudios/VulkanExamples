@@ -2,17 +2,17 @@
 #ifndef Window_h
 #define Window_h
 
-#include "NonCopyable.h"
+#include "RNonCopyable.h"
 
 #include <string>
 #include <GLFW/glfw3.h>
 
 namespace rtvvulfw {
 
-class Window: private NonCopyable {
+class RWindow: private RNonCopyable {
 public:
-    Window(const std::string &title, uint32_t width=800, uint32_t height=600);
-    ~Window();
+    RWindow(const std::string &title, uint32_t width=800, uint32_t height=600);
+    ~RWindow();
 
     bool shouldClose() {
         return glfwWindowShouldClose(mWindow);
@@ -35,7 +35,7 @@ public:
     }
 
 protected:
-    std::string mTitle{ "Vulkan Window" };
+    std::string mTitle{ "Vulkan RWindow" };
     uint32_t mWidth{ 800 };
     uint32_t mHeight{ 600 };
     GLFWwindow* mWindow{ nullptr };

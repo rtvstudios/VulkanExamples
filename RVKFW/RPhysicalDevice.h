@@ -6,25 +6,25 @@
 #include <memory>
 #include <vector>
 
-#include "NonCopyable.h"
+#include "RNonCopyable.h"
 #include <GLFW/glfw3.h>
 #include <vector>
 #include <set>
 
 namespace rtvvulfw {
 
-class VulInstance;
-class VulLogicalDevice;
-class VulSurface;
-class Window;
-class VulSwapChain;
+class RInstance;
+class RLogicalDevice;
+class RSurface;
+class RWindow;
+class RSwapChain;
 
-class VulPhysicalDevice: private NonCopyable {
+class RPhysicalDevice: private RNonCopyable {
 public:
     static const std::vector<const char*> deviceExtensions;
 
-    VulPhysicalDevice(VulInstance *instance, VulSurface *surface, Window *window);
-    ~VulPhysicalDevice();
+    RPhysicalDevice(RInstance *instance, RSurface *surface, RWindow *window);
+    ~RPhysicalDevice();
 
     bool isCreated() const {
         return mPhysicalDevice != VK_NULL_HANDLE;
@@ -35,7 +35,7 @@ public:
     }
 
     const char * tag() const {
-        return "VulPhysicalDevice";
+        return "RPhysicalDevice";
     }
 
 protected:
@@ -44,13 +44,13 @@ protected:
     
     std::string getAllExtensions(VkPhysicalDevice device) const;
 
-    VulInstance *mInstance{ nullptr };
+    RInstance *mInstance{ nullptr };
     VkResult mResult{ VK_NOT_READY };
-    VulSurface *mSurface{ nullptr };
-    Window *mWindow{ nullptr };
+    RSurface *mSurface{ nullptr };
+    RWindow *mWindow{ nullptr };
     VkPhysicalDevice mPhysicalDevice{ VK_NULL_HANDLE };
-    std::shared_ptr<VulLogicalDevice> mGraphicDevice;
-    std::shared_ptr<VulSwapChain> mSwapChain;
+    std::shared_ptr<RLogicalDevice> mGraphicDevice;
+    std::shared_ptr<RSwapChain> mSwapChain;
 };
 
 }

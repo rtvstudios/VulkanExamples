@@ -2,31 +2,31 @@
 #ifndef VulSurface_h
 #define VulSurface_h
 
-#include "NonCopyable.h"
+#include "RNonCopyable.h"
 
 #include <string>
 #include <GLFW/glfw3.h>
 
 namespace rtvvulfw {
 
-class VulInstance;
-class Window;
+class RInstance;
+class RWindow;
 
-class VulSurface: private NonCopyable {
+class RSurface: private RNonCopyable {
 public:
-    VulSurface(VulInstance *vulInstance, Window *window);
-    ~VulSurface();
+    RSurface(RInstance *vulInstance, RWindow *window);
+    ~RSurface();
 
     VkSurfaceKHR handle() {
         return mSurface;
     }
 
     const char * tag() const {
-        return "VulSurface";
+        return "RSurface";
     }
 
 protected:
-    VulInstance *mVulInstance{ nullptr };
+    RInstance *mVulInstance{ nullptr };
     VkSurfaceKHR mSurface{ VK_NULL_HANDLE };
 };
 

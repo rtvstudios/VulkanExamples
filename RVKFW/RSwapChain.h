@@ -2,7 +2,7 @@
 #ifndef VulSwapChain_h
 #define VulSwapChain_h
 
-#include "NonCopyable.h"
+#include "RNonCopyable.h"
 
 #include <string>
 #include <vector>
@@ -12,12 +12,12 @@
 
 namespace rtvvulfw {
 
-class VulPhysicalDevice;
-class VulSurface;
-class Window;
-class VulLogicalDevice;
+class RPhysicalDevice;
+class RSurface;
+class RWindow;
+class RLogicalDevice;
 
-class VulSwapChain: private NonCopyable {
+class RSwapChain: private RNonCopyable {
 public:
     struct SwapChainSupportDetails {
         VkSurfaceCapabilitiesKHR capabilities;
@@ -25,15 +25,15 @@ public:
         std::vector<VkPresentModeKHR> presentModes;
     };
 
-    VulSwapChain(VulPhysicalDevice *physicalDevice, VulLogicalDevice *logicalDevice, VulSurface *surface, Window *window);
+    RSwapChain(RPhysicalDevice *physicalDevice, RLogicalDevice *logicalDevice, RSurface *surface, RWindow *window);
 
-    ~VulSwapChain();
+    ~RSwapChain();
 
     bool create(uint32_t graphicsFamily, uint32_t presentFamily);
     bool destroy();
 
     const char * tag() const {
-        return "VulSwapChain";
+        return "RSwapChain";
     }
 
     VkSwapchainKHR handle() {
@@ -48,10 +48,10 @@ protected:
     VkExtent2D chooseSwapExtent();
 
     VkSwapchainKHR mSwapChain{ VK_NULL_HANDLE };
-    VulPhysicalDevice *mPhysicalDevice{ nullptr };
-    VulLogicalDevice *mLogicalDevice{nullptr};
-    VulSurface *mSurface{ nullptr };
-    Window *mWindow{ nullptr };
+    RPhysicalDevice *mPhysicalDevice{ nullptr };
+    RLogicalDevice *mLogicalDevice{nullptr};
+    RSurface *mSurface{ nullptr };
+    RWindow *mWindow{ nullptr };
 
     SwapChainSupportDetails mSwapChainSupportDetails;
 
