@@ -1,7 +1,7 @@
 #ifndef NonCopyable_h
 #define NonCopyable_h
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 class RNonCopyable {
 public:

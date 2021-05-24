@@ -4,7 +4,7 @@
 #include "RInstance.h"
 #include "RLogger.h"
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 RWindow* RApplication::createWindow(const std::string &title) {
     mWindow = std::make_shared<RWindow>(title);

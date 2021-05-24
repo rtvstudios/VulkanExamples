@@ -11,7 +11,7 @@
 #include <vector>
 #include <set>
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 class RInstance;
 class RLogicalDevice;

@@ -9,7 +9,7 @@
 #include "RNonCopyable.h"
 #include <GLFW/glfw3.h>
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 class RPhysicalDevice;
 class RSurface;
@@ -49,7 +49,6 @@ protected:
     std::shared_ptr<RSurface> mSurface;
 
     std::vector<const char*> mValidationLayers = { "VK_LAYER_KHRONOS_validation" };
-
 
 };
 

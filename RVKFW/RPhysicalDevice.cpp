@@ -10,7 +10,7 @@
 #include <optional>
 #include <sstream>
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 const std::vector<const char*> RPhysicalDevice::deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME

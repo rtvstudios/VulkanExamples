@@ -7,7 +7,7 @@
 #include "RWindow.h"
 #include "RLogicalDevice.h"
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 RSwapChain::RSwapChain(RPhysicalDevice *device,
                            RLogicalDevice *logicalDevice,

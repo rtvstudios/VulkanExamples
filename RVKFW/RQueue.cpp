@@ -3,7 +3,7 @@
 #include "RLogicalDevice.h"
 #include "RLogger.h"
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 RQueue::RQueue(RLogicalDevice *logicalDevice, uint32_t queueIndex) : mLogicalDevice{ logicalDevice } {
     vkGetDeviceQueue(logicalDevice->handle(), queueIndex, 0, &mQueue);

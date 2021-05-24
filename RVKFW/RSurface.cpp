@@ -5,7 +5,7 @@
 #include "RLogger.h"
 #include <GLFW/glfw3.h>
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 RSurface::RSurface(RInstance *vulInstance, RWindow *window): mVulInstance{ vulInstance } {
     if (glfwCreateWindowSurface(vulInstance->handle(), window->handle(), nullptr, &mSurface) != VK_SUCCESS) {

@@ -6,7 +6,7 @@
 
 #include <set>
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 RLogicalDevice::RLogicalDevice(RPhysicalDevice *physicalDevice, uint32_t graphicsQueue, uint32_t presentQueue) :
         mPhysicalDevice{physicalDevice} {

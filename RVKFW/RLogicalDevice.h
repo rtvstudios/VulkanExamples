@@ -9,7 +9,7 @@
 #include "RNonCopyable.h"
 #include <GLFW/glfw3.h>
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 class RPhysicalDevice;
 class RQueue;

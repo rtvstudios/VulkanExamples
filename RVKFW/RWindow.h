@@ -7,7 +7,7 @@
 #include <string>
 #include <GLFW/glfw3.h>
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 class RWindow: private RNonCopyable {
 public:

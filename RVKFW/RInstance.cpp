@@ -4,7 +4,7 @@
 #include "RLogger.h"
 #include "RSurface.h"
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 RInstance::RInstance(const std::string &appName, RWindow *window) {
     mAppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;

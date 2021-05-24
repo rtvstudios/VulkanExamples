@@ -9,7 +9,7 @@
 
 #include "RApplication.h"
 
-class GLFWWindow: public rtvvulfw::RApplication {
+class GLFWWindow: public rvkfw::RApplication {
 public:
     GLFWWindow() {
     }

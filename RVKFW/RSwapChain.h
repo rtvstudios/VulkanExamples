@@ -10,7 +10,7 @@
 #include <atomic>
 #include <GLFW/glfw3.h>
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 class RPhysicalDevice;
 class RSurface;

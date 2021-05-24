@@ -3,7 +3,7 @@
 #include <iostream>
 #include <ctime>
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 RLogger::RLogger(Type type, const std::string &tag) {
     std::time_t time = std::time(0);

@@ -4,7 +4,7 @@
 #include <string>
 #include <sstream>
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 class RLogger {
 public:

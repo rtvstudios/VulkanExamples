@@ -1,7 +1,7 @@
 
 #include "RWindow.h"
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 RWindow::RWindow(const std::string &title, uint32_t width, uint32_t height) : mTitle{title},
         mWidth{ width },

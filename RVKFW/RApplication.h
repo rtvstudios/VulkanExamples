@@ -7,7 +7,7 @@
 
 #include "RNonCopyable.h"
 
-namespace rtvvulfw {
+namespace rvkfw {
 
 class RWindow;
 class RInstance;
