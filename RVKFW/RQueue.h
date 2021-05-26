@@ -23,9 +23,14 @@ public:
         return "RQueue";
     }
 
+    uint32_t index() const {
+        return mIndex;
+    }
+
 protected:
     VkQueue mQueue{ VK_NULL_HANDLE };
     std::weak_ptr<RLogicalDevice> mLogicalDevice;
+    uint32_t mIndex{ 0 };
 };
 
 }

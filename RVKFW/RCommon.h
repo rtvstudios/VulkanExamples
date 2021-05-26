@@ -10,6 +10,7 @@
 #include <set>
 #include <map>
 #include <atomic>
+#include <functional>
 
 namespace rvkfw {
 

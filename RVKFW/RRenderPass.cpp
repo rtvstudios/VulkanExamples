@@ -6,18 +6,9 @@
 
 namespace rvkfw {
 
-RRenderPass::~RRenderPass() {
-    if (auto device = mLogicalDevice.lock()) {
-        vkDestroyRenderPass(device->handle(), mRenderPass, nullptr);
-    }
-}
-
-void RRenderPass::create(std::shared_ptr<RLogicalDevice> logicalDevice, std::shared_ptr<RSwapChain> swapChain) {
-    if (mCreated.exchange(true)) {
-        return;
-    }
-
-    mLogicalDevice = logicalDevice;
+RRenderPass::RRenderPass(std::shared_ptr<RLogicalDevice> logicalDevice,
+                         std::shared_ptr<RSwapChain> swapChain) : mLogicalDevice{logicalDevice},
+                        mSwapChain{swapChain} {
 
     VkAttachmentDescription colorAttachment{};
     colorAttachment.format = swapChain->surfaceFormat().format;
@@ -28,24 +19,47 @@ void RRenderPass::create(std::shared_ptr<RLogicalDevice> logicalDevice, std::sha
     colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    mColorAttachments.push_back(colorAttachment);
 
-    VkAttachmentReference colorAttachmentRef{};
-    colorAttachmentRef.attachment = 0;
-    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    mColorAttachmentRef.attachment = 0;
+    mColorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     VkSubpassDescription subpass{};
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpass.colorAttachmentCount = 1;
-    subpass.pColorAttachments = &colorAttachmentRef;
+    subpass.pColorAttachments = &mColorAttachmentRef;
+    mSubpasses.push_back(subpass);
 
-    VkRenderPassCreateInfo renderPassInfo{};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo.attachmentCount = 1;
-    renderPassInfo.pAttachments = &colorAttachment;
-    renderPassInfo.subpassCount = 1;
-    renderPassInfo.pSubpasses = &subpass;
+    mRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+}
 
-    if (vkCreateRenderPass(logicalDevice->handle(), &renderPassInfo, nullptr, &mRenderPass) != VK_SUCCESS) {
+RRenderPass::~RRenderPass() {
+    if (auto device = mLogicalDevice.lock()) {
+        vkDestroyRenderPass(device->handle(), mRenderPass, nullptr);
+    } else {
+        LOG_ERROR(tag(), "Could not get logical device, already destroyed!");
+    }
+}
+
+void RRenderPass::create() {
+    if (mCreated.exchange(true)) {
+        return;
+    }
+
+    auto logicalDevice = mLogicalDevice.lock();
+    auto swapChain = mSwapChain.lock();
+    if (!logicalDevice || !swapChain) {
+        LOG_ERROR(tag(), "Creation failed logicalDevice:" << logicalDevice.get() <<
+                  " swapChain:" << swapChain.get())
+        throw std::runtime_error("RRenderPass creation failed, required objects are not available!");
+    }
+
+    mRenderPassInfo.attachmentCount = static_cast<decltype(mRenderPassInfo.attachmentCount)>(mColorAttachments.size());
+    mRenderPassInfo.pAttachments = mColorAttachments.data();
+    mRenderPassInfo.subpassCount = static_cast<decltype(mRenderPassInfo.subpassCount)>(mSubpasses.size());
+    mRenderPassInfo.pSubpasses = mSubpasses.data();
+
+    if (vkCreateRenderPass(logicalDevice->handle(), &mRenderPassInfo, nullptr, &mRenderPass) != VK_SUCCESS) {
         LOG_ERROR(tag(), "Failed to create render pass!");
         throw std::runtime_error("failed to create render pass!");
     }

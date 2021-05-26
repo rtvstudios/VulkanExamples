@@ -35,6 +35,8 @@ RShaderModule::~RShaderModule() {
         if (mModule != VK_NULL_HANDLE) {
             vkDestroyShaderModule(device->handle(), mModule, nullptr);
         }
+    } else {
+        LOG_ERROR(tag(), "Could not get logical device, already destroyed!");
     }
 }
 

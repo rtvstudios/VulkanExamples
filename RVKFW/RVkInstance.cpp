@@ -1,5 +1,5 @@
 
-#include "RInstance.h"
+#include "RVkInstance.h"
 #include "RPhysicalDevice.h"
 #include "RLogger.h"
 #include "RSurface.h"
@@ -7,7 +7,7 @@
 
 namespace rvkfw {
 
-void RInstance::create(const std::string &appName, std::shared_ptr<RWindow> window) {
+void RVkInstance::create(const std::string &appName, std::shared_ptr<RWindow> window) {
     if (mCreated.exchange(true)) {
         return;
     }
@@ -45,15 +45,15 @@ void RInstance::create(const std::string &appName, std::shared_ptr<RWindow> wind
     mResult = vkCreateInstance(&mCreateInfo, nullptr, &mInstance);
 
     if (isCreated()) {
-        mSurface = RCreator::create<RSurface>(shared_from_this(), window);
-        mPhysicalDevice = RCreator::create<RPhysicalDevice>(shared_from_this(), mSurface, window);
+        mSurface = RCreator<RSurface>().create(shared_from_this(), window);
+        mPhysicalDevice = RCreator<RPhysicalDevice>().create(shared_from_this(), mSurface, window);
     } else {
         LOG_ERROR(tag(), "Could not create Vulkan Instance");
     }
 }
 
 
-RInstance::~RInstance() {
+RVkInstance::~RVkInstance() {
     mSurface = nullptr;
     mPhysicalDevice = nullptr;
     if (isCreated()) {
@@ -61,7 +61,7 @@ RInstance::~RInstance() {
     }
 }
 
-bool RInstance::isValidationLayerAvailable() const {
+bool RVkInstance::isValidationLayerAvailable() const {
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 

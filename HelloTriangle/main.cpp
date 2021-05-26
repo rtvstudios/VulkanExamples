@@ -7,15 +7,11 @@
 
 #include <iostream>
 
-#include "RApplication.h"
-
-class GLFWWindow: public rvkfw::RApplication {
-public:
-    GLFWWindow() {}
-};
+#include "HelloTriangleApp.h"
 
 int main(int argc, const char * argv[]) {
-    auto application = std::make_shared<GLFWWindow>();
+    auto application = std::make_shared<HelloTriangle>();
+    
     application->create("Hello Triangle");
     application->run();
     

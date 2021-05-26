@@ -1,7 +1,7 @@
 
 #include "RSwapChain.h"
 #include "RPhysicalDevice.h"
-#include "RInstance.h"
+#include "RVkInstance.h"
 #include "RLogger.h"
 #include "RSurface.h"
 #include "RWindow.h"
@@ -10,7 +10,22 @@
 namespace rvkfw {
 
 RSwapChain::~RSwapChain() {
-    destroy();
+    if (auto logicalDevice = mLogicalDevice.lock()) {
+        for (auto imageView : mSwapChainImageViews) {
+            vkDestroyImageView(logicalDevice->handle(), imageView, nullptr);
+        }
+
+        if (mSwapChain != VK_NULL_HANDLE) {
+            vkDestroySwapchainKHR(logicalDevice->handle(), mSwapChain, nullptr);
+        }
+    } else {
+        LOG_ERROR(tag(), "Could not get logical device, already destroyed!");
+    }
+
+    mSwapChainImages.clear();
+    mSwapChainImageViews.clear();
+
+    mCreated = false;
 }
 
 bool RSwapChain::create(std::shared_ptr<RPhysicalDevice> physicalDevice,
@@ -27,10 +42,6 @@ bool RSwapChain::create(std::shared_ptr<RPhysicalDevice> physicalDevice,
     mLogicalDevice =  logicalDevice;
     mSurface = surface;
     mWindow = window;
-
-    if (mCreated.exchange(true)) {
-        return mCreated;
-    }
 
     mSwapChainSupportDetails = querySwapChainSupport(physicalDevice->handle(), surface->handle());
 
@@ -109,23 +120,6 @@ bool RSwapChain::create(std::shared_ptr<RPhysicalDevice> physicalDevice,
             throw std::runtime_error("failed to create image views!");
         }
     }
-}
-
-bool RSwapChain::destroy() {
-    if (auto logicalDevice = mLogicalDevice.lock()) {
-        for (auto imageView : mSwapChainImageViews) {
-            vkDestroyImageView(logicalDevice->handle(), imageView, nullptr);
-        }
-
-        if (mSwapChain != VK_NULL_HANDLE) {
-            vkDestroySwapchainKHR(logicalDevice->handle(), mSwapChain, nullptr);
-        }
-    }
-
-    mSwapChainImages.clear();
-    mSwapChainImageViews.clear();
-
-    mCreated = false;
 }
 
 RSwapChain::SwapChainSupportDetails RSwapChain::querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface) {

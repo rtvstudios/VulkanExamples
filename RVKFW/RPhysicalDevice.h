@@ -10,7 +10,7 @@
 
 namespace rvkfw {
 
-class RInstance;
+class RVkInstance;
 class RLogicalDevice;
 class RSurface;
 class RWindow;
@@ -23,7 +23,7 @@ public:
     RPhysicalDevice() = default;
     ~RPhysicalDevice();
 
-    void create(std::shared_ptr<RInstance> instance, std::shared_ptr<RSurface> surface, std::shared_ptr<RWindow> window);
+    void create(std::shared_ptr<RVkInstance> instance, std::shared_ptr<RSurface> surface, std::shared_ptr<RWindow> window);
 
     bool isCreated() const {
         return mPhysicalDevice != VK_NULL_HANDLE;
@@ -37,6 +37,14 @@ public:
         return "RPhysicalDevice";
     }
 
+    std::shared_ptr<RLogicalDevice> logicalDevice() {
+        return mLogicalDevice;
+    }
+
+    std::shared_ptr<RSwapChain> swapChain() {
+        return mSwapChain;
+    }
+
 protected:
 
     bool checkDeviceExtensionSupport(VkPhysicalDevice device) const;
@@ -46,7 +54,7 @@ protected:
     VkResult mResult{ VK_NOT_READY };
     VkPhysicalDevice mPhysicalDevice{ VK_NULL_HANDLE };
 
-    std::weak_ptr<RInstance> mInstance;
+    std::weak_ptr<RVkInstance> mInstance;
     std::weak_ptr<RSurface> mSurface;
     std::weak_ptr<RWindow> mWindow;
 

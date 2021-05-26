@@ -4,6 +4,8 @@
 #include "RQueue.h"
 #include "RLogger.h"
 #include "RCreator.h"
+#include "RCommandPool.h"
+#include "RFramebuffer.h"
 
 #include <set>
 
@@ -50,8 +52,9 @@ void RLogicalDevice::create(std::shared_ptr<RPhysicalDevice> physicalDevice,
 
     LOG_DEBUG(tag(), "Logical Device Created graphicsQueue:" << graphicsQueue << " presentQueue: " << presentQueue);
 
-    mGraphicsQueue = RCreator::create<RQueue>(shared_from_this(), graphicsQueue);
-    mPresentQueue = RCreator::create<RQueue>(shared_from_this(), presentQueue);
+    mGraphicsQueue = RCreator<RQueue>().create(shared_from_this(), graphicsQueue);
+    mPresentQueue = RCreator<RQueue>().create(shared_from_this(), presentQueue);
+    mCommandPool = RCreator<RCommandPool>(shared_from_this()).create();
 }
 
 RLogicalDevice::~RLogicalDevice() {

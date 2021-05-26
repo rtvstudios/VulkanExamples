@@ -11,6 +11,8 @@ RFramebuffer::~RFramebuffer() {
         for (auto framebuffer : mSwapChainFramebuffers) {
             vkDestroyFramebuffer(logicalDevice->handle(), framebuffer, nullptr);
         }
+    } else {
+        LOG_ERROR(tag(), "Could not get logical device, already destroyed!");
     }
 }
 

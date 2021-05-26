@@ -28,6 +28,10 @@ public:
         return "RFramebuffer";
     }
 
+    const std::vector<VkFramebuffer> &frameBufferHandles() {
+        return mSwapChainFramebuffers;
+    }
+
 protected:
     std::weak_ptr<RRenderPass> mRenderPass;
     std::weak_ptr<RSwapChain> mSwapChain;

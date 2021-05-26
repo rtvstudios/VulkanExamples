@@ -12,11 +12,11 @@ class RSwapChain;
 
 class RRenderPass: public RObject {
 public:
-    RRenderPass() = default;
+    RRenderPass(std::shared_ptr<RLogicalDevice> logicalDevice,
+                std::shared_ptr<RSwapChain> swapChain);
     ~RRenderPass();
 
-    void create(std::shared_ptr<RLogicalDevice> logicalDevice,
-                std::shared_ptr<RSwapChain> swapChain);
+    void create();
 
     const char * tag() const override {
         return "RRenderPass";
@@ -26,9 +26,33 @@ public:
         return mRenderPass;
     }
 
+    std::vector<VkAttachmentDescription> &colorAttachments() {
+        return mColorAttachments;
+    }
+
+    VkAttachmentReference &colorAttachmentRef() {
+        return mColorAttachmentRef;
+    }
+
+    std::vector<VkSubpassDescription> &subpass() {
+        return mSubpasses;
+    }
+
+    VkRenderPassCreateInfo &renderPassInfo() {
+        return mRenderPassInfo;
+    }
+
 protected:
-    std::weak_ptr<RLogicalDevice> mLogicalDevice;
     VkRenderPass mRenderPass{ VK_NULL_HANDLE };
+
+    std::weak_ptr<RLogicalDevice> mLogicalDevice;
+    std::weak_ptr<RSwapChain> mSwapChain;
+
+    std::vector<VkAttachmentDescription> mColorAttachments;
+    std::vector<VkSubpassDescription> mSubpasses;
+
+    VkAttachmentReference mColorAttachmentRef{};
+    VkRenderPassCreateInfo mRenderPassInfo{};
 };
 
 }

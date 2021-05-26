@@ -6,7 +6,7 @@
 
 namespace rvkfw {
 
-class RInstance;
+class RVkInstance;
 class RWindow;
 
 class RSurface: public RObject {
@@ -14,7 +14,7 @@ public:
     RSurface() = default;
     ~RSurface();
 
-    void create(std::shared_ptr<RInstance> instance, std::shared_ptr<RWindow> window);
+    void create(std::shared_ptr<RVkInstance> instance, std::shared_ptr<RWindow> window);
 
     VkSurfaceKHR handle() {
         return mSurface;
@@ -25,7 +25,7 @@ public:
     }
 
 protected:
-    std::weak_ptr<RInstance> mInstance;
+    std::weak_ptr<RVkInstance> mInstance;
     VkSurfaceKHR mSurface{ VK_NULL_HANDLE };
 };
 

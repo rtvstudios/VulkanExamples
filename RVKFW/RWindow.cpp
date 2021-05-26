@@ -27,5 +27,4 @@ RWindow::~RWindow() {
     glfwTerminate();
 }
 
-
 }

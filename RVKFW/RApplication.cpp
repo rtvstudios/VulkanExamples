@@ -1,23 +1,33 @@
 
 #include "RApplication.h"
 #include "RWindow.h"
-#include "RInstance.h"
+#include "RVkInstance.h"
 #include "RLogger.h"
 #include "RCreator.h"
+#include "RLogicalDevice.h"
+#include "RPhysicalDevice.h"
+#include "RSwapChain.h"
+#include "RRenderPass.h"
 
 namespace rvkfw {
+
+RApplication::~RApplication() {
+    mVkInstance = nullptr;
+    mWindow = nullptr;
+}
 
 void RApplication::create(const std::string &title) {
     if (mCreated.exchange(true)) {
         return;
     }
     
-    mWindow = RCreator::create<RWindow>(title);
+    mWindow = RCreator<RWindow>().create(title);
 }
 
 void RApplication::run() {
     if (!mWindow) {
-        throw std::logic_error("Create RWindow First");
+        LOG_ERROR(tag(), "Window not created")
+        throw std::logic_error("Window not created");
     }
 
     init();
@@ -28,7 +38,7 @@ void RApplication::run() {
 void RApplication::init() {
     LOG_DEBUG(tag(), "RApplication intialization started");
 
-    mVkInstance = RCreator::create<RInstance>(mWindow->title(), mWindow);
+    mVkInstance = RCreator<RVkInstance>().create(mWindow->title(), mWindow);
     if (!mVkInstance->isCreated()) {
         throw std::runtime_error("Failed to create Vulkan instance");
     }
@@ -37,8 +47,9 @@ void RApplication::init() {
 
 void RApplication::cleanup() {
     LOG_DEBUG(tag(), "RApplication cleaning up");
-    mVkInstance = nullptr;
-    mWindow = nullptr;
+}
+
+void RApplication::draw() const {
 }
 
 void RApplication::mainLoop() {
@@ -46,8 +57,25 @@ void RApplication::mainLoop() {
 
     while(!mWindow->shouldClose()) {
         glfwPollEvents();
+        draw();
     }
     LOG_DEBUG(tag(), "RApplication mainLoop finished");
+}
+
+std::shared_ptr<RPhysicalDevice> RApplication::physicalDevice() {
+    return mVkInstance->physicalDevice();
+}
+
+std::shared_ptr<RLogicalDevice> RApplication::logicalDevice() {
+    return physicalDevice()->logicalDevice();
+}
+
+std::shared_ptr<RSwapChain> RApplication::swapChain() {
+    return physicalDevice()->swapChain();
+}
+
+std::shared_ptr<RCommandPool> RApplication::commandPool() {
+    return logicalDevice()->commandPool();
 }
 
 }

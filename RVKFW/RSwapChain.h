@@ -29,8 +29,6 @@ public:
                 std::shared_ptr<RWindow> window,
                 uint32_t graphicsFamily, uint32_t presentFamily);
 
-    bool destroy();
-
     const char * tag() const override {
         return "RSwapChain";
     }
@@ -69,11 +67,11 @@ protected:
     std::weak_ptr<RSurface> mSurface;
     std::weak_ptr<RWindow> mWindow;
 
-    SwapChainSupportDetails mSwapChainSupportDetails;
+    SwapChainSupportDetails mSwapChainSupportDetails{};
 
-    VkSurfaceFormatKHR mSurfaceFormat;
-    VkPresentModeKHR mPresentMode;
-    VkExtent2D mSwapExtent;
+    VkSurfaceFormatKHR mSurfaceFormat{};
+    VkPresentModeKHR mPresentMode{};
+    VkExtent2D mSwapExtent{};
 
     std::vector<VkImage> mSwapChainImages;
     std::vector<VkImageView> mSwapChainImageViews;

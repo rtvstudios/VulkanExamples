@@ -12,6 +12,7 @@ namespace rvkfw {
 
 class RPhysicalDevice;
 class RQueue;
+class RCommandPool;
 
 class RLogicalDevice: public std::enable_shared_from_this<RLogicalDevice>, public RObject {
 public:
@@ -39,6 +40,10 @@ public:
     std::shared_ptr<RQueue> presentQueue() {
         return mPresentQueue;
     }
+    
+    std::shared_ptr<RCommandPool> commandPool() {
+        return mCommandPool;
+    }
 
 protected:
     VkDevice mDevice{ VK_NULL_HANDLE };
@@ -47,6 +52,7 @@ protected:
 
     std::shared_ptr<RQueue> mGraphicsQueue;
     std::shared_ptr<RQueue> mPresentQueue;
+    std::shared_ptr<RCommandPool> mCommandPool;
 };
 
 }

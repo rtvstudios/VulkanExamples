@@ -14,12 +14,14 @@ target_include_directories(HelloTriangle PUBLIC ${CUSTOM_INCLUDES} "../RVKFW")
 
 target_link_libraries(HelloTriangle ${CUSTOM_LIBRARIES} "RVKFW")
 
+add_compile_definitions(SHADER_DIRECTORY="${CMAKE_CURRENT_BINARY_DIR}")
+
 foreach(SHADER ${SHADERS})
 add_custom_command(OUTPUT ${SHADER}.spv
-COMMAND glslc ${CMAKE_CURRENT_SOURCE_DIR}/${SHADER} -g -o ${SHADER}.spv
+COMMAND glslc ${CMAKE_CURRENT_SOURCE_DIR}/${SHADER} -g -o ${CMAKE_CURRENT_BINARY_DIR}/${SHADER}.spv
 DEPENDS ${SHADER}
-COMMENT "Rebuilding ${SHADER}.spv" )
-message(STATUS "Generating build commands for ${SHADER}.spv")
+COMMENT "Rebuilding ${CMAKE_CURRENT_BINARY_DIR}/${SHADER}.spv" )
+message(STATUS "Generating build commands for ${CMAKE_CURRENT_BINARY_DIR}/${SHADER}.spv")
 endforeach()
 
 

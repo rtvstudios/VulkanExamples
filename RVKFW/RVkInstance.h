@@ -14,10 +14,10 @@ class RPhysicalDevice;
 class RSurface;
 class RWindow;
 
-class RInstance: public std::enable_shared_from_this<RInstance>, public RObject {
+class RVkInstance: public std::enable_shared_from_this<RVkInstance>, public RObject {
 public:
-    RInstance() = default;
-    ~RInstance();
+    RVkInstance() = default;
+    ~RVkInstance();
 
     void create(const std::string &appName, std::shared_ptr<RWindow> window);
 
@@ -35,8 +35,12 @@ public:
         return "RInstance";
     }
 
-    RSurface * surface() {
-        return mSurface.get();
+    std::shared_ptr<RSurface> surface() {
+        return mSurface;
+    }
+
+    std::shared_ptr<RPhysicalDevice> physicalDevice() {
+        return mPhysicalDevice;
     }
 
 protected:
