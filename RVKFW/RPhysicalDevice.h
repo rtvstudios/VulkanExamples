@@ -20,10 +20,16 @@ class RPhysicalDevice: public std::enable_shared_from_this<RPhysicalDevice>, pub
 public:
     static const std::vector<const char*> deviceExtensions;
 
-    RPhysicalDevice() = default;
+    RPhysicalDevice(std::weak_ptr<RVkInstance> instance,
+                    std::weak_ptr<RSurface> surface,
+                    std::weak_ptr<RWindow> window) :
+                    mInstance{instance}, mSurface{surface}, mWindow{window} {
+    }
     ~RPhysicalDevice();
 
-    void create(std::shared_ptr<RVkInstance> instance, std::shared_ptr<RSurface> surface, std::shared_ptr<RWindow> window);
+    void preCreate() override;
+
+    void create();
 
     bool isCreated() const {
         return mPhysicalDevice != VK_NULL_HANDLE;

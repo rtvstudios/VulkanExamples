@@ -16,16 +16,28 @@ const std::vector<const char*> RPhysicalDevice::deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-void RPhysicalDevice::create(std::shared_ptr<RVkInstance> instance,
-                             std::shared_ptr<RSurface> surface,
-                             std::shared_ptr<RWindow> window) {
+void RPhysicalDevice::preCreate() {
+    mLogicalDevice = std::make_shared<RLogicalDevice>(shared_from_this());
+    mLogicalDevice->preCreate();
+
+    mSwapChain = std::make_shared<RSwapChain>(shared_from_this(), mLogicalDevice,
+                                              mSurface, mWindow);
+    mSwapChain->preCreate();
+}
+
+void RPhysicalDevice::create() {
     if (mCreated.exchange(true)) {
         return;
     }
 
-    mInstance = instance;
-    mSurface = surface;
-    mWindow = window;
+    auto instance = mInstance.lock();
+    ASSERT_NOT_NULL(instance);
+
+    auto surface = mSurface.lock();
+    ASSERT_NOT_NULL(surface);
+
+    auto window = mWindow.lock();
+    ASSERT_NOT_NULL(window);
 
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(instance->handle(), &deviceCount, nullptr);
@@ -110,12 +122,9 @@ void RPhysicalDevice::create(std::shared_ptr<RVkInstance> instance,
     
     LOG_DEBUG(tag(), "Extensions : " << getAllExtensions(mPhysicalDevice));
 
-    mLogicalDevice = std::make_shared<RLogicalDevice>();
-    mLogicalDevice->create(shared_from_this(), graphicsFamily.value(), presentFamily.value());
+    mLogicalDevice->create(graphicsFamily.value(), presentFamily.value());
 
-    mSwapChain = std::make_shared<RSwapChain>();
-    mSwapChain->create(shared_from_this(), mLogicalDevice,
-                       surface, window, graphicsFamily.value(),
+    mSwapChain->create(graphicsFamily.value(),
                        presentFamily.value());
 }
 

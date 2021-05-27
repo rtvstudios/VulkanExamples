@@ -7,12 +7,16 @@
 
 namespace rvkfw {
 
-void RSurface::create(std::shared_ptr<RVkInstance> instance, std::shared_ptr<RWindow> window) {
+void RSurface::create() {
     if (mCreated.exchange(true)) {
         return;
     }
 
-    mInstance = instance;
+    auto instance = mInstance.lock();
+    ASSERT_NOT_NULL(instance);
+
+    auto window = mWindow.lock();
+    ASSERT_NOT_NULL(window);
 
     if (glfwCreateWindowSurface(instance->handle(), window->handle(), nullptr, &mSurface) != VK_SUCCESS) {
         LOG_ERROR(tag(), "Creating surface failed");

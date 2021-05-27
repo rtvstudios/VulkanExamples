@@ -16,10 +16,14 @@ class RWindow;
 
 class RVkInstance: public std::enable_shared_from_this<RVkInstance>, public RObject {
 public:
-    RVkInstance() = default;
+    RVkInstance(std::weak_ptr<RWindow> window) : mWindow{window} {
+    }
+
     ~RVkInstance();
 
-    void create(const std::string &appName, std::shared_ptr<RWindow> window);
+    void preCreate() override;
+
+    void create(const std::string &appName);
 
     bool isCreated() const {
         return mResult == VK_SUCCESS;
@@ -49,6 +53,8 @@ protected:
     VkInstance mInstance{ VK_NULL_HANDLE };
     VkApplicationInfo mAppInfo{};
     VkInstanceCreateInfo mCreateInfo{};
+
+    std::weak_ptr<RWindow> mWindow;
 
     std::shared_ptr<RPhysicalDevice> mPhysicalDevice;
     std::shared_ptr<RSurface> mSurface;

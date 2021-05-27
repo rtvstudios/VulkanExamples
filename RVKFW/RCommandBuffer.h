@@ -23,12 +23,12 @@ public:
         RGraphicsPipeline *graphicsPipeline;
     };
 
-    RCommandBuffer(std::shared_ptr<RRenderPass> renderPass,
-                   std::shared_ptr<RSwapChain> swapChain,
-                   std::shared_ptr<RLogicalDevice> logicalDevice,
-                   std::shared_ptr<RFramebuffer> framebuffer,
-                   std::shared_ptr<RGraphicsPipeline> graphicsPipeline,
-                   std::shared_ptr<RCommandPool> commandPool);
+    RCommandBuffer(std::weak_ptr<RRenderPass> renderPass,
+                   std::weak_ptr<RSwapChain> swapChain,
+                   std::weak_ptr<RLogicalDevice> logicalDevice,
+                   std::weak_ptr<RFramebuffer> framebuffer,
+                   std::weak_ptr<RGraphicsPipeline> graphicsPipeline,
+                   std::weak_ptr<RCommandPool> commandPool);
 
     ~RCommandBuffer() = default;
 

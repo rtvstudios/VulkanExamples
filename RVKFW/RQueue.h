@@ -14,10 +14,12 @@ class RLogicalDevice;
 
 class RQueue: public RObject {
 public:
-    RQueue() = default;
+    RQueue(std::weak_ptr<RLogicalDevice> logicalDevice) : mLogicalDevice{logicalDevice} {
+    }
+
     ~RQueue();
 
-    void create(std::shared_ptr<RLogicalDevice> logicalDevice, uint32_t queueIndex);
+    void create(uint32_t queueIndex);
 
     const char * tag() const override {
         return "RQueue";

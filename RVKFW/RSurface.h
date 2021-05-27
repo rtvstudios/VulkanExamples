@@ -11,10 +11,13 @@ class RWindow;
 
 class RSurface: public RObject {
 public:
-    RSurface() = default;
+    RSurface(std::weak_ptr<RVkInstance> instance, std::weak_ptr<RWindow> window) :
+            mInstance{instance}, mWindow{window} {
+    }
+
     ~RSurface();
 
-    void create(std::shared_ptr<RVkInstance> instance, std::shared_ptr<RWindow> window);
+    void create();
 
     VkSurfaceKHR handle() {
         return mSurface;
@@ -26,6 +29,8 @@ public:
 
 protected:
     std::weak_ptr<RVkInstance> mInstance;
+    std::weak_ptr<RWindow> mWindow;
+
     VkSurfaceKHR mSurface{ VK_NULL_HANDLE };
 };
 

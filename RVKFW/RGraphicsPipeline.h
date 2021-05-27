@@ -13,9 +13,9 @@ class RRenderPass;
 
 class RGraphicsPipeline: public RObject {
 public:
-    RGraphicsPipeline(std::shared_ptr<RLogicalDevice> logicalDevice,
-                      std::shared_ptr<RRenderPass> renderPass,
-                      std::shared_ptr<RSwapChain> swapChain);
+    RGraphicsPipeline(std::weak_ptr<RLogicalDevice> logicalDevice,
+                      std::weak_ptr<RRenderPass> renderPass,
+                      std::weak_ptr<RSwapChain> swapChain);
     ~RGraphicsPipeline();
 
     void create(const std::string &vertexShaderFile,

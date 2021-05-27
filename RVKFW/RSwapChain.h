@@ -19,15 +19,16 @@ public:
         std::vector<VkPresentModeKHR> presentModes;
     };
 
-    RSwapChain() = default;
+    RSwapChain(std::weak_ptr<RPhysicalDevice> physicalDevice,
+               std::weak_ptr<RLogicalDevice> logicalDevice,
+               std::weak_ptr<RSurface> surface,
+               std::weak_ptr<RWindow> window) : mPhysicalDevice{physicalDevice},
+        mLogicalDevice{logicalDevice}, mSurface{surface}, mWindow{window} {
+    }
 
     ~RSwapChain();
 
-    bool create(std::shared_ptr<RPhysicalDevice> physicalDevice,
-                std::shared_ptr<RLogicalDevice> logicalDevice,
-                std::shared_ptr<RSurface> surface,
-                std::shared_ptr<RWindow> window,
-                uint32_t graphicsFamily, uint32_t presentFamily);
+    bool create(uint32_t graphicsFamily, uint32_t presentFamily);
 
     const char * tag() const override {
         return "RSwapChain";

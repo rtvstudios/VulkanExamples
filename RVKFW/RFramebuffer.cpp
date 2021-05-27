@@ -22,14 +22,13 @@ void RFramebuffer::create() {
     }
 
     auto logicalDevice = mLogicalDevice.lock();
+    ASSERT_NOT_NULL(logicalDevice);
+
     auto renderPass = mRenderPass.lock();
+    ASSERT_NOT_NULL(renderPass);
+
     auto swapChain = mSwapChain.lock();
-    if (!logicalDevice || !renderPass || !swapChain) {
-        LOG_ERROR(tag(), "Creation failed logicalDevice:" << logicalDevice.get() <<
-                  " renderPass:" << renderPass.get() <<
-                  " swapChain:" << swapChain.get())
-        throw std::runtime_error("Framebuffer creation failed, required objects are not available!");
-    }
+    ASSERT_NOT_NULL(swapChain);
 
     mSwapChainFramebuffers.resize(swapChain->imageViews().size());
 

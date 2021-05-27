@@ -21,7 +21,7 @@ class RFramebuffer;
 
 class RApplication: public RObject {
 public:
-    void create(const std::string &title);
+    virtual void create(const std::string &title);
     void run();
 
     const char * tag() const override {
@@ -42,7 +42,7 @@ public:
     std::shared_ptr<RCommandPool> commandPool();
 
 protected:
-    RApplication() = default;
+    RApplication();
     ~RApplication();
 
     virtual void init();
@@ -53,6 +53,7 @@ protected:
     std::shared_ptr<RVkInstance> mVkInstance;
 
 private:
+    void preCreate() override;
     void mainLoop();
 };
 

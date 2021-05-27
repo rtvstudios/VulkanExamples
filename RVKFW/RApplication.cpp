@@ -10,9 +10,21 @@
 
 namespace rvkfw {
 
+RApplication::RApplication() {
+    preCreate();
+}
+
 RApplication::~RApplication() {
     mVkInstance = nullptr;
     mWindow = nullptr;
+}
+
+void RApplication::preCreate() {
+    mWindow = std::make_shared<RWindow>();
+    mWindow->preCreate();
+
+    mVkInstance = std::make_shared<RVkInstance>(mWindow);
+    mVkInstance->preCreate();
 }
 
 void RApplication::create(const std::string &title) {
@@ -20,7 +32,6 @@ void RApplication::create(const std::string &title) {
         return;
     }
     
-    mWindow = std::make_shared<RWindow>();
     mWindow->create(title);
 }
 
@@ -38,8 +49,7 @@ void RApplication::run() {
 void RApplication::init() {
     LOG_DEBUG(tag(), "RApplication intialization started");
 
-    mVkInstance = std::make_shared<RVkInstance>();
-    mVkInstance->create(mWindow->title(), mWindow);
+    mVkInstance->create(mWindow->title());
     if (!mVkInstance->isCreated()) {
         throw std::runtime_error("Failed to create Vulkan instance");
     }

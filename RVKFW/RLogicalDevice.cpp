@@ -10,14 +10,20 @@
 
 namespace rvkfw {
 
-void RLogicalDevice::create(std::shared_ptr<RPhysicalDevice> physicalDevice,
-                            uint32_t graphicsQueue,
+void RLogicalDevice::preCreate() {
+    mGraphicsQueue = std::make_shared<RQueue>(shared_from_this());
+    mPresentQueue = std::make_shared<RQueue>(shared_from_this());
+    mCommandPool = std::make_shared<RCommandPool>(shared_from_this());
+}
+
+void RLogicalDevice::create(uint32_t graphicsQueue,
                             uint32_t presentQueue) {
     if (mCreated.exchange(true)) {
         return;
     }
 
-    mPhysicalDevice = physicalDevice;
+    auto physicalDevice = mPhysicalDevice.lock();
+    ASSERT_NOT_NULL(physicalDevice);
 
     float queuePriority = 1.0f;
     std::set<uint32_t> uniqueQueueFamilies{graphicsQueue, presentQueue};
@@ -51,13 +57,9 @@ void RLogicalDevice::create(std::shared_ptr<RPhysicalDevice> physicalDevice,
 
     LOG_DEBUG(tag(), "Logical Device Created graphicsQueue:" << graphicsQueue << " presentQueue: " << presentQueue);
 
-    mGraphicsQueue = std::make_shared<RQueue>();
-    mGraphicsQueue->create(shared_from_this(), graphicsQueue);
+    mGraphicsQueue->create(graphicsQueue);
+    mPresentQueue->create(presentQueue);
 
-    mPresentQueue = std::make_shared<RQueue>();
-    mPresentQueue->create(shared_from_this(), presentQueue);
-
-    mCommandPool = std::make_shared<RCommandPool>(shared_from_this());
     mCommandPool->create();
 }
 

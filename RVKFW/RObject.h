@@ -16,6 +16,8 @@ public:
         return "RObject";
     }
 
+    virtual void preCreate() {}
+
 protected:
     std::atomic_bool mCreated{ false };
 };

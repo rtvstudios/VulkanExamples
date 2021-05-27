@@ -6,7 +6,17 @@
 
 namespace rvkfw {
 
-void RVkInstance::create(const std::string &appName, std::shared_ptr<RWindow> window) {
+void RVkInstance::preCreate() {
+    mSurface = std::make_shared<RSurface>(shared_from_this(), mWindow);
+    mSurface->preCreate();
+
+    mPhysicalDevice = std::make_shared<RPhysicalDevice>(shared_from_this(), mSurface, mWindow);
+    mPhysicalDevice->preCreate();
+}
+
+void RVkInstance::create(const std::string &appName) {
+    auto window = mWindow.lock();
+
     if (mCreated.exchange(true)) {
         return;
     }
@@ -44,11 +54,8 @@ void RVkInstance::create(const std::string &appName, std::shared_ptr<RWindow> wi
     mResult = vkCreateInstance(&mCreateInfo, nullptr, &mInstance);
 
     if (isCreated()) {
-        mSurface = std::make_shared<RSurface>();
-        mSurface->create(shared_from_this(), window);
-
-        mPhysicalDevice = std::make_shared<RPhysicalDevice>();
-        mPhysicalDevice->create(shared_from_this(), mSurface, window);
+        mSurface->create();
+        mPhysicalDevice->create();
     } else {
         LOG_ERROR(tag(), "Could not create Vulkan Instance");
     }

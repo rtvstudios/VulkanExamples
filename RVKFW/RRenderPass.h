@@ -12,8 +12,8 @@ class RSwapChain;
 
 class RRenderPass: public RObject {
 public:
-    RRenderPass(std::shared_ptr<RLogicalDevice> logicalDevice,
-                std::shared_ptr<RSwapChain> swapChain);
+    RRenderPass(std::weak_ptr<RLogicalDevice> logicalDevice,
+                std::weak_ptr<RSwapChain> swapChain);
     ~RRenderPass();
 
     void create();

@@ -6,12 +6,11 @@
 
 namespace rvkfw {
 
-RRenderPass::RRenderPass(std::shared_ptr<RLogicalDevice> logicalDevice,
-                         std::shared_ptr<RSwapChain> swapChain) : mLogicalDevice{logicalDevice},
+RRenderPass::RRenderPass(std::weak_ptr<RLogicalDevice> logicalDevice,
+                         std::weak_ptr<RSwapChain> swapChain) : mLogicalDevice{logicalDevice},
                         mSwapChain{swapChain} {
 
     VkAttachmentDescription colorAttachment{};
-    colorAttachment.format = swapChain->surfaceFormat().format;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -47,11 +46,15 @@ void RRenderPass::create() {
     }
 
     auto logicalDevice = mLogicalDevice.lock();
+    ASSERT_NOT_NULL(logicalDevice);
+
     auto swapChain = mSwapChain.lock();
-    if (!logicalDevice || !swapChain) {
-        LOG_ERROR(tag(), "Creation failed logicalDevice:" << logicalDevice.get() <<
-                  " swapChain:" << swapChain.get())
-        throw std::runtime_error("RRenderPass creation failed, required objects are not available!");
+    ASSERT_NOT_NULL(swapChain);
+
+    for (auto &colorAttachment: mColorAttachments) {
+        if (colorAttachment.format == VK_FORMAT_UNDEFINED) {
+            colorAttachment.format = swapChain->surfaceFormat().format;
+        }
     }
 
     mRenderPassInfo.attachmentCount = static_cast<decltype(mRenderPassInfo.attachmentCount)>(mColorAttachments.size());

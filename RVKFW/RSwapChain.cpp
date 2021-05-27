@@ -28,20 +28,23 @@ RSwapChain::~RSwapChain() {
     mCreated = false;
 }
 
-bool RSwapChain::create(std::shared_ptr<RPhysicalDevice> physicalDevice,
-                        std::shared_ptr<RLogicalDevice> logicalDevice,
-                        std::shared_ptr<RSurface> surface,
-                        std::shared_ptr<RWindow> window,
-                        uint32_t graphicsFamily, uint32_t presentFamily) {
+bool RSwapChain::create(uint32_t graphicsFamily, uint32_t presentFamily) {
 
     if (mCreated.exchange(true)) {
         return;
     }
 
-    mPhysicalDevice = physicalDevice;
-    mLogicalDevice =  logicalDevice;
-    mSurface = surface;
-    mWindow = window;
+    auto physicalDevice = mPhysicalDevice.lock();
+    ASSERT_NOT_NULL(physicalDevice);
+
+    auto logicalDevice = mLogicalDevice.lock();
+    ASSERT_NOT_NULL(logicalDevice);
+
+    auto surface = mSurface.lock();
+    ASSERT_NOT_NULL(surface);
+
+    auto window = mWindow.lock();
+    ASSERT_NOT_NULL(window);
 
     mSwapChainSupportDetails = querySwapChainSupport(physicalDevice->handle(), surface->handle());
 

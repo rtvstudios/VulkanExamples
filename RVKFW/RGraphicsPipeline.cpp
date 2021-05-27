@@ -8,9 +8,9 @@
 
 namespace rvkfw {
 
-RGraphicsPipeline::RGraphicsPipeline(std::shared_ptr<RLogicalDevice> logicalDevice,
-                                     std::shared_ptr<RRenderPass> renderPass,
-                                     std::shared_ptr<RSwapChain> swapChain) :
+RGraphicsPipeline::RGraphicsPipeline(std::weak_ptr<RLogicalDevice> logicalDevice,
+                                     std::weak_ptr<RRenderPass> renderPass,
+                                     std::weak_ptr<RSwapChain> swapChain) :
     mRenderPass{renderPass}, mSwapChain{swapChain}, mLogicalDevice{logicalDevice} {
 
         mVertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -29,17 +29,12 @@ RGraphicsPipeline::RGraphicsPipeline(std::shared_ptr<RLogicalDevice> logicalDevi
         mInputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         mInputAssembly.primitiveRestartEnable = VK_FALSE;
 
-        auto swapChainExtent = swapChain->swapExtent();
-
         mViewport.x = 0.0f;
         mViewport.y = 0.0f;
-        mViewport.width = (float) swapChainExtent.width;
-        mViewport.height = (float) swapChainExtent.height;
         mViewport.minDepth = 0.0f;
         mViewport.maxDepth = 1.0f;
 
         mScissor.offset = {0, 0};
-        mScissor.extent = swapChainExtent;
 
         mViewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
         mViewportState.viewportCount = 1;
@@ -85,7 +80,6 @@ RGraphicsPipeline::RGraphicsPipeline(std::shared_ptr<RLogicalDevice> logicalDevi
         mPipelineInfo.pRasterizationState = &mRasterizer;
         mPipelineInfo.pMultisampleState = &mMultisampling;
         mPipelineInfo.pColorBlendState = &mColorBlending;
-        mPipelineInfo.renderPass = renderPass->handle();
         mPipelineInfo.subpass = 0;
         mPipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 }
@@ -112,20 +106,30 @@ void RGraphicsPipeline::create(const std::string &vertexShaderFile,
     }
 
     auto logicalDevice = mLogicalDevice.lock();
+    ASSERT_NOT_NULL(logicalDevice);
+
     auto renderPass = mRenderPass.lock();
+    ASSERT_NOT_NULL(renderPass);
+
     auto swapChain = mSwapChain.lock();
-    if (!logicalDevice || !renderPass || !swapChain) {
-        LOG_ERROR(tag(), "Creation failed logicalDevice:" << logicalDevice.get() <<
-                  " renderPass:" << renderPass.get() <<
-                  " swapChain:" << swapChain.get())
-        throw std::runtime_error("Graphics pipeline creation failed, required objects are not available!");
+    ASSERT_NOT_NULL(swapChain);
+
+    auto vertexShader = std::make_shared<RShaderModule>(logicalDevice);
+    vertexShader->create(vertexShaderFile);
+
+    auto fragmentShader = std::make_shared<RShaderModule>(logicalDevice);
+    fragmentShader->create(fragmentShaderFile);
+
+    auto swapChainExtent = swapChain->swapExtent();
+    if (static_cast<int>(mViewport.width) == 0) {
+        mViewport.width = (float) swapChainExtent.width;
     }
-
-    auto vertexShader = std::make_shared<RShaderModule>();
-    vertexShader->create(logicalDevice, vertexShaderFile);
-
-    auto fragmentShader = std::make_shared<RShaderModule>();
-    fragmentShader->create(logicalDevice, fragmentShaderFile);
+    if (static_cast<int>(mViewport.height) == 0) {
+        mViewport.height = (float) swapChainExtent.height;
+    }
+    if (mScissor.extent.height == 0 || mScissor.extent.width == 0) {
+        mScissor.extent = swapChainExtent;
+    }
 
     mVertShaderStageInfo.module = vertexShader->handle();
     mFragShaderStageInfo.module = fragmentShader->handle();
@@ -135,6 +139,8 @@ void RGraphicsPipeline::create(const std::string &vertexShaderFile,
 
     mPipelineInfo.stageCount = static_cast<decltype(mPipelineInfo.stageCount)>(mShaderStages.size());
     mPipelineInfo.pStages = mShaderStages.data();
+
+    mPipelineInfo.renderPass = renderPass->handle();
 
     if (vkCreatePipelineLayout(logicalDevice->handle(), &mPipelineLayoutInfo, nullptr, &mPipelineLayout) != VK_SUCCESS) {
         LOG_ERROR(tag(), "Failed to create pipeline layout!");

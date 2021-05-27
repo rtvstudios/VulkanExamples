@@ -11,10 +11,13 @@ class RLogicalDevice;
 
 class RShaderModule: public RObject {
 public:
-    RShaderModule() = default;
+    RShaderModule(std::weak_ptr<RLogicalDevice> logicalDevice) :
+        mLogicalDevice{logicalDevice} {
+    }
+
     ~RShaderModule();
 
-    void create(std::shared_ptr<RLogicalDevice> device, const std::string &shaderFile);
+    void create(const std::string &shaderFile);
 
     const char * tag() const override {
         return "RShaderModule";

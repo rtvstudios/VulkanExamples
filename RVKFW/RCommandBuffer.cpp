@@ -8,12 +8,12 @@
 
 namespace rvkfw {
 
-RCommandBuffer::RCommandBuffer(std::shared_ptr<RRenderPass> renderPass,
-               std::shared_ptr<RSwapChain> swapChain,
-               std::shared_ptr<RLogicalDevice> logicalDevice,
-               std::shared_ptr<RFramebuffer> framebuffer,
-               std::shared_ptr<RGraphicsPipeline> graphicsPipeline,
-               std::shared_ptr<RCommandPool> commandPool) :
+RCommandBuffer::RCommandBuffer(std::weak_ptr<RRenderPass> renderPass,
+               std::weak_ptr<RSwapChain> swapChain,
+               std::weak_ptr<RLogicalDevice> logicalDevice,
+               std::weak_ptr<RFramebuffer> framebuffer,
+               std::weak_ptr<RGraphicsPipeline> graphicsPipeline,
+               std::weak_ptr<RCommandPool> commandPool) :
     mRenderPass{renderPass},
     mSwapChain{swapChain},
     mLogicalDevice{logicalDevice},
@@ -39,18 +39,22 @@ void RCommandBuffer::create() {
     }
 
     auto logicalDevice = mLogicalDevice.lock();
-    auto renderPass = mRenderPass.lock();
-    auto swapChain = mSwapChain.lock();
-    auto commandPool = mCommandPool.lock();
-    auto frameBuffer = mFramebuffer.lock();
-    auto graphicsPipeline = mGraphicsPipeline.lock();
+    ASSERT_NOT_NULL(logicalDevice);
 
-    if (!logicalDevice || !renderPass || !swapChain || !commandPool || !frameBuffer) {
-        LOG_ERROR(tag(), "Creation failed logicalDevice:" << logicalDevice.get() <<
-                  " renderPass:" << renderPass.get() <<
-                  " swapChain:" << swapChain.get())
-        throw std::runtime_error("RCommandBuffer creation failed, required objects are not available!");
-    }
+    auto renderPass = mRenderPass.lock();
+    ASSERT_NOT_NULL(renderPass);
+
+    auto swapChain = mSwapChain.lock();
+    ASSERT_NOT_NULL(swapChain);
+
+    auto commandPool = mCommandPool.lock();
+    ASSERT_NOT_NULL(commandPool);
+
+    auto frameBuffer = mFramebuffer.lock();
+    ASSERT_NOT_NULL(frameBuffer);
+
+    auto graphicsPipeline = mGraphicsPipeline.lock();
+    ASSERT_NOT_NULL(graphicsPipeline);
 
     mCommandBuffers.resize(swapChain->images().size());
 

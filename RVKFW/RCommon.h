@@ -13,8 +13,12 @@
 #include <functional>
 
 namespace rvkfw {
-
 }
+
+#define ASSERT_NOT_NULL_TAG(obj, tag) if (!obj) { LOG_ERROR(tag, "Could not get object " << #obj); \
+                                         throw std::runtime_error("required objects " #obj " is not available!"); }
+
+#define ASSERT_NOT_NULL(obj) ASSERT_NOT_NULL_TAG(obj, tag())
 
 #endif
 

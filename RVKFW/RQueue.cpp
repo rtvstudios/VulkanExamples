@@ -5,15 +5,15 @@
 
 namespace rvkfw {
 
-void RQueue::create(std::shared_ptr<RLogicalDevice> logicalDevice, uint32_t queueIndex) {
+void RQueue::create(uint32_t queueIndex) {
     mIndex = queueIndex;
 
     if (mCreated.exchange(true)) {
         return;
     }
 
-    mLogicalDevice = logicalDevice;
-
+    auto logicalDevice = mLogicalDevice.lock();
+    ASSERT_NOT_NULL(logicalDevice);
 
     vkGetDeviceQueue(logicalDevice->handle(), queueIndex, 0, &mQueue);
     if (mQueue == VK_NULL_HANDLE) {

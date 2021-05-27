@@ -16,10 +16,13 @@ class RCommandPool;
 
 class RLogicalDevice: public std::enable_shared_from_this<RLogicalDevice>, public RObject {
 public:
-    RLogicalDevice() = default;
+    RLogicalDevice(std::shared_ptr<RPhysicalDevice> physicalDevice) : mPhysicalDevice{physicalDevice} {
+    }
+
     ~RLogicalDevice();
 
-    void create(std::shared_ptr<RPhysicalDevice> physicalDevice, uint32_t graphicsQueue, uint32_t presentQueue);
+    void preCreate() override;
+    void create(uint32_t graphicsQueue, uint32_t presentQueue);
 
     const char * tag() const override {
         return "RLogicalDevice";

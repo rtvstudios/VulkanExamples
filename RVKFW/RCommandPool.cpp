@@ -21,10 +21,7 @@ void RCommandPool::create() {
     }
  
     auto logicalDevice = mLogicalDevice.lock();
-    if (!logicalDevice) {
-        LOG_ERROR(tag(), "Creation failed logicalDevice:" << logicalDevice.get());
-        throw std::runtime_error("Framebuffer creation failed, required objects are not available!");
-    }
+    ASSERT_NOT_NULL(logicalDevice);
 
     VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
