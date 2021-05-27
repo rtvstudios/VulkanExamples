@@ -23,7 +23,8 @@ public:
 
     void preCreate() override;
     void create(uint32_t graphicsQueue, uint32_t presentQueue);
-
+    void destroy() override;
+    
     const char * tag() const override {
         return "RLogicalDevice";
     }

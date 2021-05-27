@@ -24,14 +24,23 @@ void RSurface::create() {
     }
 }
 
-RSurface::~RSurface() {
+void RSurface::destroy() {
+    if (!mCreated.exchange(false)) {
+        return;
+    }
+
     if (auto instance = mInstance.lock()) {
         if (mSurface != VK_NULL_HANDLE) {
             vkDestroySurfaceKHR(instance->handle(), mSurface, nullptr);
         }
+        mSurface = VK_NULL_HANDLE;
     } else {
         LOG_ERROR(tag(), "Could not get vkInstance, already destroyed!");
    }
+}
+
+RSurface::~RSurface() {
+    destroy();
 }
 
 }

@@ -7,13 +7,23 @@
 namespace rvkfw {
 
 RFramebuffer::~RFramebuffer() {
+    destroy();
+}
+
+void RFramebuffer::destroy() {
+    if (!mCreated.exchange(false)) {
+        return;
+    }
+
     if (auto logicalDevice = mLogicalDevice.lock()) {
         for (auto framebuffer : mSwapChainFramebuffers) {
             vkDestroyFramebuffer(logicalDevice->handle(), framebuffer, nullptr);
         }
+        mSwapChainFramebuffers.clear();
     } else {
         LOG_ERROR(tag(), "Could not get logical device, already destroyed!");
     }
+
 }
 
 void RFramebuffer::create() {

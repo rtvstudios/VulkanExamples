@@ -17,6 +17,7 @@ public:
     ~RRenderPass();
 
     void create();
+    void destroy() override;
 
     const char * tag() const override {
         return "RRenderPass";

@@ -6,10 +6,19 @@
 namespace rvkfw {
 
 RCommandPool::~RCommandPool() {
+    destroy();
+}
+
+void RCommandPool::destroy() {
+    if (!mCreated.exchange(false)) {
+        return;
+    }
+
     if (auto logicalDevice = mLogicalDevice.lock()) {
         if (mCommandPool != VK_NULL_HANDLE) {
             vkDestroyCommandPool(logicalDevice->handle(), mCommandPool, nullptr);
         }
+        mCommandPool = VK_NULL_HANDLE;
     } else {
         LOG_ERROR(tag(), "Could not get logical device, already destroyed!");
     }

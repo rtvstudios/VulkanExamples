@@ -61,13 +61,21 @@ void RVkInstance::create(const std::string &appName) {
     }
 }
 
+void RVkInstance::destroy() {
+    if (!mCreated.exchange(false)) {
+        return;
+    }
+    mPhysicalDevice->destroy();
+    mSurface->destroy();
 
-RVkInstance::~RVkInstance() {
-    mSurface = nullptr;
-    mPhysicalDevice = nullptr;
-    if (isCreated()) {
+    if (mInstance != VK_NULL_HANDLE) {
         vkDestroyInstance(mInstance, nullptr);
     }
+    mInstance = VK_NULL_HANDLE;
+}
+
+RVkInstance::~RVkInstance() {
+    destroy();
 }
 
 bool RVkInstance::isValidationLayerAvailable() const {

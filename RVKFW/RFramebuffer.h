@@ -23,7 +23,8 @@ public:
     ~RFramebuffer();
 
     void create();
-
+    void destroy() override;
+    
     const char * tag() const override {
         return "RFramebuffer";
     }

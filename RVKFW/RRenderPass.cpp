@@ -42,12 +42,22 @@ RRenderPass::RRenderPass(std::weak_ptr<RLogicalDevice> logicalDevice,
     mRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 }
 
-RRenderPass::~RRenderPass() {
+void RRenderPass::destroy() {
+    if (!mCreated.exchange(false)) {
+        return;
+    }
     if (auto device = mLogicalDevice.lock()) {
-        vkDestroyRenderPass(device->handle(), mRenderPass, nullptr);
+        if (mRenderPass != VK_NULL_HANDLE) {
+            vkDestroyRenderPass(device->handle(), mRenderPass, nullptr);
+        }
+        mRenderPass = VK_NULL_HANDLE;
     } else {
         LOG_ERROR(tag(), "Could not get logical device, already destroyed!");
     }
+}
+
+RRenderPass::~RRenderPass() {
+    destroy();
 }
 
 void RRenderPass::create() {

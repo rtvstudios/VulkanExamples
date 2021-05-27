@@ -30,14 +30,23 @@ void RShaderModule::create(const std::string &shaderFile) {
     LOG_DEBUG(tag(), "Shader module is created");
 }
 
-RShaderModule::~RShaderModule() {
+void RShaderModule::destroy() {
+    if (!mCreated.exchange(false)) {
+        return;
+    }
+
     if (auto device = mLogicalDevice.lock()) {
         if (mModule != VK_NULL_HANDLE) {
             vkDestroyShaderModule(device->handle(), mModule, nullptr);
         }
+        mModule = VK_NULL_HANDLE;
     } else {
         LOG_ERROR(tag(), "Could not get logical device, already destroyed!");
     }
+}
+
+RShaderModule::~RShaderModule() {
+    destroy();
 }
 
 std::vector<char> RShaderModule::readFile(const std::string& filename) {

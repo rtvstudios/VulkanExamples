@@ -12,7 +12,7 @@ public:
 
     void init() override;
     void draw() const override;
-    void cleanup() override;
+    void destroy() override;
 
 private:
     void recordDrawCommands();

@@ -19,6 +19,7 @@ public:
     ~RCommandPool();
 
     void create();
+    void destroy() override;
 
     const char * tag() const override {
         return "RCommandPool";

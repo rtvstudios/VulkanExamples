@@ -47,7 +47,7 @@ protected:
 
     virtual void init();
     virtual void draw() const;
-    virtual void cleanup();
+    void destroy() override;
 
     std::shared_ptr<RWindow> mWindow;
     std::shared_ptr<RVkInstance> mVkInstance;

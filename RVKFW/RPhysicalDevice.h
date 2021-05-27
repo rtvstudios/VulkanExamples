@@ -30,7 +30,8 @@ public:
     void preCreate() override;
 
     void create();
-
+    void destroy() override;
+    
     bool isCreated() const {
         return mPhysicalDevice != VK_NULL_HANDLE;
     }
@@ -49,6 +50,10 @@ public:
 
     std::shared_ptr<RSwapChain> swapChain() {
         return mSwapChain;
+    }
+
+    std::shared_ptr<RVkInstance> instance() const {
+        return mInstance.lock();
     }
 
 protected:

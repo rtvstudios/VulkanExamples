@@ -11,7 +11,6 @@ HelloTriangle::HelloTriangle() {
 HelloTriangle::~HelloTriangle() {
 }
 
-
 void HelloTriangle::init() {
     rvkfw::RApplication::init();
 
@@ -92,7 +91,9 @@ void HelloTriangle::recordDrawCommands() {
     }
 }
 
-void HelloTriangle::cleanup() {
+void HelloTriangle::destroy() {
+    vkDeviceWaitIdle(logicalDevice()->handle());
+    
     for (auto semaphore: mRenderFinishedSemaphores) {
         vkDestroySemaphore(logicalDevice()->handle(), semaphore, nullptr);
     }
@@ -103,13 +104,19 @@ void HelloTriangle::cleanup() {
     }
     mImageAvailableSemaphores.clear();
 
+    for (size_t i = 0; i < mMaxFramesInFlight; i++) {
+        vkDestroyFence(logicalDevice()->handle(), mInFlightFences[i], nullptr);
+    }
+    mInFlightFences.clear();
+    mImagesInFlight.clear();
+
     mCommandBuffer = nullptr;
     mGraphicsPipeline = nullptr;
     mCommandBuffer = nullptr;
     mRenderPass = nullptr;
     mFrameBuffer = nullptr;
 
-    rvkfw::RApplication::cleanup();
+    rvkfw::RApplication::destroy();
 }
 
 void HelloTriangle::draw() const {

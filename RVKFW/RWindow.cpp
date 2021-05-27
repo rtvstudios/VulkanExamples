@@ -20,11 +20,20 @@ void RWindow::create(const std::string &title, uint32_t width, uint32_t height) 
     mWindow = glfwCreateWindow(mWidth, mHeight, mTitle.c_str(), nullptr, nullptr);
 }
 
-RWindow::~RWindow() {
+void RWindow::destroy() {
+    if (!mCreated.exchange(false)) {
+        return;
+    }
+    
     if (mWindow != nullptr) {
         glfwDestroyWindow(mWindow);
+        glfwTerminate();
     }
-    glfwTerminate();
+    mWindow = nullptr;
+}
+
+RWindow::~RWindow() {
+    destroy();
 }
 
 }

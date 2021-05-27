@@ -18,6 +18,7 @@ public:
     ~RSurface();
 
     void create();
+    void destroy() override;
 
     VkSurfaceKHR handle() {
         return mSurface;

@@ -38,6 +38,8 @@ public:
         return "RWindow";
     }
 
+    void destroy() override;
+
 protected:
     std::string mTitle{ "Vulkan RWindow" };
     uint32_t mWidth{ 800 };

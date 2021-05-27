@@ -43,7 +43,7 @@ void RApplication::run() {
 
     init();
     mainLoop();
-    cleanup();
+    destroy();
 }
 
 void RApplication::init() {
@@ -56,8 +56,14 @@ void RApplication::init() {
     LOG_DEBUG(tag(), "RApplication intialization finished");
 }
 
-void RApplication::cleanup() {
-    LOG_DEBUG(tag(), "RApplication cleaning up");
+void RApplication::destroy() {
+    if (!mCreated.exchange(false)) {
+        return;
+    }
+    LOG_DEBUG(tag(), "RApplication destroying");
+
+    mWindow->destroy();
+    mVkInstance->destroy();
 }
 
 void RApplication::draw() const {

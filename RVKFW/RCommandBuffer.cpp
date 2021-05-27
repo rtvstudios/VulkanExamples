@@ -68,4 +68,11 @@ void RCommandBuffer::create() {
 
 }
 
+void RCommandBuffer::destroy() {
+    if (!mCreated.exchange(false)) {
+        return;
+    }
+}
+
+
 }

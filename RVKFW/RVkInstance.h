@@ -47,8 +47,13 @@ public:
         return mPhysicalDevice;
     }
 
-protected:
+    const std::vector<const char*> &validationLayers() const {
+        return mValidationLayers;
+    }
 
+    void destroy() override;
+    
+protected:
     VkResult mResult{ VK_NOT_READY };
     VkInstance mInstance{ VK_NULL_HANDLE };
     VkApplicationInfo mAppInfo{};

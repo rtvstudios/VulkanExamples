@@ -84,18 +84,28 @@ RGraphicsPipeline::RGraphicsPipeline(std::weak_ptr<RLogicalDevice> logicalDevice
         mPipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 }
 
-RGraphicsPipeline::~RGraphicsPipeline() {
+void RGraphicsPipeline::destroy() {
+    if (!mCreated.exchange(false)) {
+        return;
+    }
+
     if (auto logicalDevice = mLogicalDevice.lock()) {
         if (mGraphicsPipeline != VK_NULL_HANDLE) {
             vkDestroyPipeline(logicalDevice->handle(), mGraphicsPipeline, nullptr);
+            mGraphicsPipeline = VK_NULL_HANDLE;
         }
-        
+
         if (mPipelineLayout != VK_NULL_HANDLE) {
             vkDestroyPipelineLayout(logicalDevice->handle(), mPipelineLayout, nullptr);
+            mPipelineLayout = VK_NULL_HANDLE;
         }
     } else {
         LOG_INFO(tag(), "Logical device already destroyed no cleaning up is performed!");
     }
+}
+
+RGraphicsPipeline::~RGraphicsPipeline() {
+    destroy();
 }
 
 void RGraphicsPipeline::create(const std::string &vertexShaderFile,

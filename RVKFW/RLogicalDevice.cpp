@@ -5,6 +5,7 @@
 #include "RLogger.h"
 #include "RCommandPool.h"
 #include "RFramebuffer.h"
+#include "RVkInstance.h"
 
 #include <set>
 
@@ -51,6 +52,20 @@ void RLogicalDevice::create(uint32_t graphicsQueue,
     createInfo.enabledExtensionCount = RPhysicalDevice::deviceExtensions.size();
     createInfo.ppEnabledExtensionNames = RPhysicalDevice::deviceExtensions.data();
 
+#ifdef WITH_VALIDATION_LAYER
+    LOG_DEBUG(tag(), "Validation layer option enabled");
+    auto instance = physicalDevice->instance();
+    ASSERT_NOT_NULL(instance);
+    
+    if (instance->isValidationLayerAvailable()) {
+        LOG_INFO(tag(), "Validation layer available");
+        createInfo.enabledLayerCount = instance->validationLayers().size();
+        createInfo.ppEnabledLayerNames = instance->validationLayers().data();
+    } else {
+        LOG_WARN(tag(), "Validation layer not available");
+    }
+#endif
+
     if (vkCreateDevice(physicalDevice->handle(), &createInfo, nullptr, &mDevice) != VK_SUCCESS) {
         throw std::runtime_error("failed to create logical device!");
     }
@@ -63,12 +78,22 @@ void RLogicalDevice::create(uint32_t graphicsQueue,
     mCommandPool->create();
 }
 
-RLogicalDevice::~RLogicalDevice() {
-    mGraphicsQueue = nullptr;
-    mPresentQueue = nullptr;
+void RLogicalDevice::destroy() {
+    if (!mCreated.exchange(false)) {
+        return;
+    }
+
+    mGraphicsQueue->destroy();
+    mPresentQueue->destroy();
+    mCommandPool->destroy();
     if (mDevice != VK_NULL_HANDLE) {
         vkDestroyDevice(mDevice, nullptr);
+        mDevice = VK_NULL_HANDLE;
     }
+}
+
+RLogicalDevice::~RLogicalDevice() {
+    destroy();
 }
 
 }

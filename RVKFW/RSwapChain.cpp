@@ -9,7 +9,11 @@
 
 namespace rvkfw {
 
-RSwapChain::~RSwapChain() {
+void RSwapChain::destroy() {
+    if (!mCreated.exchange(false)) {
+        return;
+    }
+ 
     if (auto logicalDevice = mLogicalDevice.lock()) {
         for (auto imageView : mSwapChainImageViews) {
             vkDestroyImageView(logicalDevice->handle(), imageView, nullptr);
@@ -25,7 +29,10 @@ RSwapChain::~RSwapChain() {
     mSwapChainImages.clear();
     mSwapChainImageViews.clear();
 
-    mCreated = false;
+}
+
+RSwapChain::~RSwapChain() {
+    destroy();
 }
 
 bool RSwapChain::create(uint32_t graphicsFamily, uint32_t presentFamily) {

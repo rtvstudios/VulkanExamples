@@ -18,6 +18,7 @@ public:
     ~RShaderModule();
 
     void create(const std::string &shaderFile);
+    void destroy() override;
 
     const char * tag() const override {
         return "RShaderModule";

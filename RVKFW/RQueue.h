@@ -20,6 +20,7 @@ public:
     ~RQueue();
 
     void create(uint32_t queueIndex);
+    void destroy() override;
 
     const char * tag() const override {
         return "RQueue";

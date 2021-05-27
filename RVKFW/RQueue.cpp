@@ -24,7 +24,14 @@ void RQueue::create(uint32_t queueIndex) {
     LOG_DEBUG(tag(), "Queue Created : " << queueIndex);
 }
 
+void RQueue::destroy() {
+    if (!mCreated.exchange(false)) {
+        return;
+    }
+}
+
 RQueue::~RQueue() {
+    destroy();
 }
 
 }

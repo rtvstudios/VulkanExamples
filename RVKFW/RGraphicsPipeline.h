@@ -20,7 +20,8 @@ public:
 
     void create(const std::string &vertexShaderFile,
                 const std::string &fragmentShaderFile);
-
+    void destroy() override;
+    
     const char * tag() const override {
         return "RGraphicsPipeline";
     }

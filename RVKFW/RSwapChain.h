@@ -56,6 +56,8 @@ public:
 
     static SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
 
+    void destroy() override;
+    
 protected:
     VkSurfaceFormatKHR chooseSwapSurfaceFormat();
     VkPresentModeKHR chooseSwapPresentMode();

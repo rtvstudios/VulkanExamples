@@ -13,7 +13,8 @@
 namespace rvkfw {
 
 const std::vector<const char*> RPhysicalDevice::deviceExtensions = {
-    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+    //"VK_KHR_portability_subset"
 };
 
 void RPhysicalDevice::preCreate() {
@@ -158,9 +159,16 @@ bool RPhysicalDevice::checkDeviceExtensionSupport(VkPhysicalDevice device)  cons
     return requiredExtensions.empty();
 }
 
+void RPhysicalDevice::destroy() {
+    if (!mCreated.exchange(false)) {
+        return;
+    }
+    mSwapChain->destroy();
+    mLogicalDevice->destroy();
+}
+
 RPhysicalDevice::~RPhysicalDevice() {
-    mSwapChain = nullptr;
-    mLogicalDevice = nullptr;
+    destroy();
 }
 
 }
