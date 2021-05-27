@@ -29,6 +29,16 @@ RRenderPass::RRenderPass(std::weak_ptr<RLogicalDevice> logicalDevice,
     subpass.pColorAttachments = &mColorAttachmentRef;
     mSubpasses.push_back(subpass);
 
+    mDependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+    mDependency.dstSubpass = 0;
+    mDependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    mDependency.srcAccessMask = 0;
+    mDependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    mDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+    mRenderPassInfo.dependencyCount = 1;
+    mRenderPassInfo.pDependencies = &mDependency;
+
     mRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 }
 

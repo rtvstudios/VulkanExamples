@@ -23,7 +23,7 @@ public:
         return "RShaderModule";
     }
 
-    VkShaderModule handle() {
+    VkShaderModule handle() const {
         return mModule;
     }
 

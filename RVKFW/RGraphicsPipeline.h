@@ -77,6 +77,10 @@ public:
         return mPipelineInfo;
     }
 
+    VkPipeline handle() const {
+        return mGraphicsPipeline;
+    }
+
 protected:
     std::weak_ptr<RRenderPass> mRenderPass;
     std::weak_ptr<RSwapChain> mSwapChain;

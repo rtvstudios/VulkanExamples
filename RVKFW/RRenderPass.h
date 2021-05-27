@@ -22,7 +22,7 @@ public:
         return "RRenderPass";
     }
 
-    VkRenderPass handle() {
+    VkRenderPass handle() const {
         return mRenderPass;
     }
 
@@ -42,6 +42,10 @@ public:
         return mRenderPassInfo;
     }
 
+    VkSubpassDependency &dependency() {
+        return mDependency;
+    }
+
 protected:
     VkRenderPass mRenderPass{ VK_NULL_HANDLE };
 
@@ -53,6 +57,8 @@ protected:
 
     VkAttachmentReference mColorAttachmentRef{};
     VkRenderPassCreateInfo mRenderPassInfo{};
+    VkSubpassDependency mDependency{};
+
 };
 
 }

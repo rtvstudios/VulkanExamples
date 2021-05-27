@@ -29,6 +29,10 @@ public:
         return mIndex;
     }
 
+    VkQueue handle() const {
+        return mQueue;
+    }
+
 protected:
     VkQueue mQueue{ VK_NULL_HANDLE };
     std::weak_ptr<RLogicalDevice> mLogicalDevice;

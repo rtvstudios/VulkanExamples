@@ -73,19 +73,19 @@ void RApplication::mainLoop() {
     LOG_DEBUG(tag(), "RApplication mainLoop finished");
 }
 
-std::shared_ptr<RPhysicalDevice> RApplication::physicalDevice() {
+std::shared_ptr<RPhysicalDevice> RApplication::physicalDevice() const {
     return mVkInstance->physicalDevice();
 }
 
-std::shared_ptr<RLogicalDevice> RApplication::logicalDevice() {
+std::shared_ptr<RLogicalDevice> RApplication::logicalDevice() const {
     return physicalDevice()->logicalDevice();
 }
 
-std::shared_ptr<RSwapChain> RApplication::swapChain() {
+std::shared_ptr<RSwapChain> RApplication::swapChain() const {
     return physicalDevice()->swapChain();
 }
 
-std::shared_ptr<RCommandPool> RApplication::commandPool() {
+std::shared_ptr<RCommandPool> RApplication::commandPool() const {
     return logicalDevice()->commandPool();
 }
 

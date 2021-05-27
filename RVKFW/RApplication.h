@@ -36,10 +36,10 @@ public:
         return mVkInstance;
     }
 
-    std::shared_ptr<RPhysicalDevice> physicalDevice();
-    std::shared_ptr<RLogicalDevice> logicalDevice();
-    std::shared_ptr<RSwapChain> swapChain();
-    std::shared_ptr<RCommandPool> commandPool();
+    std::shared_ptr<RPhysicalDevice> physicalDevice() const;
+    std::shared_ptr<RLogicalDevice> logicalDevice() const;
+    std::shared_ptr<RSwapChain> swapChain() const;
+    std::shared_ptr<RCommandPool> commandPool() const;
 
 protected:
     RApplication();

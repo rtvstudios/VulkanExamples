@@ -35,7 +35,7 @@ public:
         return mPhysicalDevice != VK_NULL_HANDLE;
     }
 
-    VkPhysicalDevice handle() {
+    VkPhysicalDevice handle() const {
         return mPhysicalDevice;
     }
 

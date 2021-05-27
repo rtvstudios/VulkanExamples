@@ -34,7 +34,7 @@ public:
         return "RSwapChain";
     }
 
-    VkSwapchainKHR handle() {
+    VkSwapchainKHR handle() const {
         return mSwapChain;
     }
 

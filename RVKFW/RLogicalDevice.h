@@ -28,7 +28,7 @@ public:
         return "RLogicalDevice";
     }
 
-    VkDevice handle() {
+    VkDevice handle() const {
         return mDevice;
     }
 
@@ -36,15 +36,15 @@ public:
         return mDevice != VK_NULL_HANDLE;
     }
 
-    std::shared_ptr<RQueue> graphicsQueue() {
+    std::shared_ptr<RQueue> graphicsQueue() const {
         return mGraphicsQueue;
     }
 
-    std::shared_ptr<RQueue> presentQueue() {
+    std::shared_ptr<RQueue> presentQueue() const {
         return mPresentQueue;
     }
     
-    std::shared_ptr<RCommandPool> commandPool() {
+    std::shared_ptr<RCommandPool> commandPool() const {
         return mCommandPool;
     }
 

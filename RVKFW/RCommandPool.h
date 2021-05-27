@@ -24,7 +24,7 @@ public:
         return "RCommandPool";
     }
 
-    VkCommandPool handle() {
+    VkCommandPool handle() const {
         return mCommandPool;
     }
 
