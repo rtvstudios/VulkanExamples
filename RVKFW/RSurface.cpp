@@ -3,7 +3,6 @@
 #include "RVkInstance.h"
 #include "RWindow.h"
 #include "RLogger.h"
-#include "RCreator.h"
 #include <GLFW/glfw3.h>
 
 namespace rvkfw {

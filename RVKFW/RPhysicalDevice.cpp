@@ -6,7 +6,6 @@
 #include "RSurface.h"
 #include "RWindow.h"
 #include "RSwapChain.h"
-#include "RCreator.h"
 
 #include <optional>
 #include <sstream>
@@ -111,12 +110,13 @@ void RPhysicalDevice::create(std::shared_ptr<RVkInstance> instance,
     
     LOG_DEBUG(tag(), "Extensions : " << getAllExtensions(mPhysicalDevice));
 
-    mLogicalDevice = RCreator<RLogicalDevice>().create(shared_from_this(),
-                                                      graphicsFamily.value(), presentFamily.value());
+    mLogicalDevice = std::make_shared<RLogicalDevice>();
+    mLogicalDevice->create(shared_from_this(), graphicsFamily.value(), presentFamily.value());
 
-    mSwapChain = RCreator<RSwapChain>().create(shared_from_this(), mLogicalDevice,
-                                              surface, window, graphicsFamily.value(),
-                                              presentFamily.value());
+    mSwapChain = std::make_shared<RSwapChain>();
+    mSwapChain->create(shared_from_this(), mLogicalDevice,
+                       surface, window, graphicsFamily.value(),
+                       presentFamily.value());
 }
 
 std::string RPhysicalDevice::getAllExtensions(VkPhysicalDevice device) const {

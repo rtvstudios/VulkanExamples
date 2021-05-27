@@ -3,7 +3,6 @@
 #include "RWindow.h"
 #include "RVkInstance.h"
 #include "RLogger.h"
-#include "RCreator.h"
 #include "RLogicalDevice.h"
 #include "RPhysicalDevice.h"
 #include "RSwapChain.h"
@@ -21,7 +20,8 @@ void RApplication::create(const std::string &title) {
         return;
     }
     
-    mWindow = RCreator<RWindow>().create(title);
+    mWindow = std::make_shared<RWindow>();
+    mWindow->create(title);
 }
 
 void RApplication::run() {
@@ -38,7 +38,8 @@ void RApplication::run() {
 void RApplication::init() {
     LOG_DEBUG(tag(), "RApplication intialization started");
 
-    mVkInstance = RCreator<RVkInstance>().create(mWindow->title(), mWindow);
+    mVkInstance = std::make_shared<RVkInstance>();
+    mVkInstance->create(mWindow->title(), mWindow);
     if (!mVkInstance->isCreated()) {
         throw std::runtime_error("Failed to create Vulkan instance");
     }

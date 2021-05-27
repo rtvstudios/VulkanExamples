@@ -2,7 +2,6 @@
 #include "RGraphicsPipeline.h"
 #include "RShaderModule.h"
 #include "RLogicalDevice.h"
-#include "RCreator.h"
 #include "RSwapChain.h"
 #include "RLogger.h"
 #include "RRenderPass.h"
@@ -122,8 +121,11 @@ void RGraphicsPipeline::create(const std::string &vertexShaderFile,
         throw std::runtime_error("Graphics pipeline creation failed, required objects are not available!");
     }
 
-    auto vertexShader = RCreator<RShaderModule>().create(logicalDevice, vertexShaderFile);
-    auto fragmentShader = RCreator<RShaderModule>().create(logicalDevice, fragmentShaderFile);
+    auto vertexShader = std::make_shared<RShaderModule>();
+    vertexShader->create(logicalDevice, vertexShaderFile);
+
+    auto fragmentShader = std::make_shared<RShaderModule>();
+    fragmentShader->create(logicalDevice, fragmentShaderFile);
 
     mVertShaderStageInfo.module = vertexShader->handle();
     mFragShaderStageInfo.module = fragmentShader->handle();
