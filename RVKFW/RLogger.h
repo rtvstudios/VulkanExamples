@@ -17,14 +17,14 @@ public:
 
     std::string typeToString(Type type) const {
         switch (type) {
-            case Info:
-                return  "INFO   ";
             case Warning:
                 return  "WARNING";
             case Error:
                 return  "ERROR  ";
             case Debug:
                 return  "DEBUG  ";
+            default:
+                return  "INFO   ";
         }
     }
 

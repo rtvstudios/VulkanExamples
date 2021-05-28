@@ -38,7 +38,7 @@ RSwapChain::~RSwapChain() {
 bool RSwapChain::create(uint32_t graphicsFamily, uint32_t presentFamily) {
 
     if (mCreated.exchange(true)) {
-        return;
+        return true;
     }
 
     auto physicalDevice = mPhysicalDevice.lock();
@@ -130,6 +130,8 @@ bool RSwapChain::create(uint32_t graphicsFamily, uint32_t presentFamily) {
             throw std::runtime_error("failed to create image views!");
         }
     }
+
+    return true;
 }
 
 RSwapChain::SwapChainSupportDetails RSwapChain::querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface) {
