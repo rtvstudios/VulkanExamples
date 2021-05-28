@@ -17,7 +17,7 @@ public:
     }
 
     virtual void preCreate() {}
-    virtual void destroy() = 0;
+    virtual void destroy() {}
 
 protected:
     std::atomic_bool mCreated{ false };

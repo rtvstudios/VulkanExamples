@@ -32,7 +32,9 @@ add_compile_definitions(WITH_VALIDATION_LAYER)
 add_compile_definitions(DEBUG)
 add_compile_definitions(VK_VERSION_1_0)
 
+set(CMAKE_CXX_FLAGS "-Werror")
+
 add_subdirectory(RVKFW)
-add_subdirectory(HelloTriangle)
+add_subdirectory(Triangle)
 
 

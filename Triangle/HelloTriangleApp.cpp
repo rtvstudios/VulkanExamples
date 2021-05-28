@@ -4,6 +4,10 @@
 #include "RLogicalDevice.h"
 #include "RSwapChain.h"
 #include "RQueue.h"
+#include "RWindow.h"
+
+#include <array>
+#include <glm/glm.hpp>
 
 HelloTriangle::HelloTriangle() {
 }
@@ -11,8 +15,10 @@ HelloTriangle::HelloTriangle() {
 HelloTriangle::~HelloTriangle() {
 }
 
-void HelloTriangle::init() {
-    rvkfw::RApplication::init();
+bool HelloTriangle::create(const std::string &appName) {
+    if (!rvkfw::RApplication::create(appName)) {
+        return false;
+    }
 
     mRenderPass = std::make_shared<rvkfw::RRenderPass>(logicalDevice(), swapChain());
     mRenderPass->create();
@@ -21,6 +27,65 @@ void HelloTriangle::init() {
     mFrameBuffer->create();
 
     mGraphicsPipeline = std::make_shared<rvkfw::RGraphicsPipeline>(logicalDevice(), mRenderPass, swapChain());
+    mGraphicsPipeline->preCreate();
+    
+    mGraphicsPipeline->inputAssembly().topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    
+    mGraphicsPipeline->rasterizer().cullMode = VK_CULL_MODE_BACK_BIT;
+    mGraphicsPipeline->rasterizer().frontFace = VK_FRONT_FACE_CLOCKWISE;
+    mGraphicsPipeline->rasterizer().polygonMode = VK_POLYGON_MODE_FILL;
+
+    struct Vertex {
+        glm::vec2 pos;
+        glm::vec4 color;
+
+        static VkVertexInputBindingDescription getBindingDescription() {
+            VkVertexInputBindingDescription bindingDescription{};
+            bindingDescription.binding = 0;
+            bindingDescription.stride = sizeof(Vertex);
+            bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+            return bindingDescription;
+        }
+
+        static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions() {
+            std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
+
+            attributeDescriptions[0].binding = 0;
+            attributeDescriptions[0].location = 0;
+            attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+            attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+            attributeDescriptions[1].binding = 0;
+            attributeDescriptions[1].location = 1;
+            attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+            attributeDescriptions[1].offset = offsetof(Vertex, color);
+
+            return attributeDescriptions;
+        }
+    };
+
+    const std::vector<Vertex> vertices = {
+        {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+        {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}},
+        {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}}
+    };
+
+    mVerticesCount = vertices.size();
+    
+    mVertexBuffer = std::make_shared<rvkfw::RVertexBuffer>(physicalDevice(), logicalDevice());
+
+    const void *data = vertices.data();
+    mVertexBuffer->create(data, vertices.size() * sizeof(vertices[0]));
+
+    auto bindingDescription = Vertex::getBindingDescription();
+    auto attributeDescriptions = Vertex::getAttributeDescriptions();
+
+    mGraphicsPipeline->vertexInputInfo().vertexBindingDescriptionCount = 1;
+    mGraphicsPipeline->vertexInputInfo().vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+
+    mGraphicsPipeline->vertexInputInfo().pVertexBindingDescriptions = &bindingDescription;
+    mGraphicsPipeline->vertexInputInfo().pVertexAttributeDescriptions = attributeDescriptions.data();
+
     mGraphicsPipeline->create(mShaderDirectory + "/ColoredTriangle.vert.spv",
                               mShaderDirectory + "/ColoredTriangle.frag.spv");
     
@@ -28,8 +93,6 @@ void HelloTriangle::init() {
                                                              logicalDevice(), mFrameBuffer, mGraphicsPipeline,
                                                              commandPool());
     mCommandBuffer->create();
-
-
 
     mImageAvailableSemaphores.resize(mMaxFramesInFlight);
     mRenderFinishedSemaphores.resize(mMaxFramesInFlight);
@@ -52,6 +115,8 @@ void HelloTriangle::init() {
     }
 
     recordDrawCommands();
+
+    return true;
 }
 
 void HelloTriangle::recordDrawCommands() {
@@ -81,7 +146,12 @@ void HelloTriangle::recordDrawCommands() {
 
         vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mGraphicsPipeline->handle());
 
-        vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+        vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mGraphicsPipeline->handle());
+        VkBuffer vertexBuffers[] = {mVertexBuffer->handle()};
+        VkDeviceSize offsets[] = {0};
+        vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
+
+        vkCmdDraw(commandBuffers[i], mVerticesCount, 1, 0, 0);
 
         vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -92,6 +162,10 @@ void HelloTriangle::recordDrawCommands() {
 }
 
 void HelloTriangle::destroy() {
+    if (!mCreated) {
+        return;
+    }
+
     vkDeviceWaitIdle(logicalDevice()->handle());
     
     for (auto semaphore: mRenderFinishedSemaphores) {
@@ -115,6 +189,7 @@ void HelloTriangle::destroy() {
     mCommandBuffer = nullptr;
     mRenderPass = nullptr;
     mFrameBuffer = nullptr;
+    mVertexBuffer = nullptr;
 
     rvkfw::RApplication::destroy();
 }
@@ -123,7 +198,9 @@ void HelloTriangle::draw() const {
     vkWaitForFences(logicalDevice()->handle(), 1, &mInFlightFences[mCurrentFrame], VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;
-    vkAcquireNextImageKHR(logicalDevice()->handle(), swapChain()->handle(), UINT64_MAX, mImageAvailableSemaphores[mCurrentFrame], VK_NULL_HANDLE, &imageIndex);
+    vkAcquireNextImageKHR(logicalDevice()->handle(), swapChain()->handle(),
+                          UINT64_MAX, mImageAvailableSemaphores[mCurrentFrame],
+                          VK_NULL_HANDLE, &imageIndex);
 
     if (mImagesInFlight[imageIndex] != VK_NULL_HANDLE) {
         vkWaitForFences(logicalDevice()->handle(), 1, &mImagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
@@ -148,7 +225,8 @@ void HelloTriangle::draw() const {
 
     vkResetFences(logicalDevice()->handle(), 1, &mInFlightFences[mCurrentFrame]);
 
-    if (vkQueueSubmit(logicalDevice()->graphicsQueue()->handle(), 1, &submitInfo, mInFlightFences[mCurrentFrame]) != VK_SUCCESS) {
+    if (vkQueueSubmit(logicalDevice()->graphicsQueue()->handle(), 1,
+                      &submitInfo, mInFlightFences[mCurrentFrame]) != VK_SUCCESS) {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
 

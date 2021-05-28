@@ -56,6 +56,10 @@ public:
         return mInstance.lock();
     }
 
+    const VkPhysicalDeviceMemoryProperties &memProperties() const {
+        return mMemProperties;
+    }
+
 protected:
 
     bool checkDeviceExtensionSupport(VkPhysicalDevice device) const;
@@ -71,6 +75,8 @@ protected:
 
     std::shared_ptr<RLogicalDevice> mLogicalDevice;
     std::shared_ptr<RSwapChain> mSwapChain;
+
+    VkPhysicalDeviceMemoryProperties mMemProperties;
 };
 
 }

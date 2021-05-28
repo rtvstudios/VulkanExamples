@@ -27,33 +27,33 @@ void RApplication::preCreate() {
     mVkInstance->preCreate();
 }
 
-void RApplication::create(const std::string &title) {
+bool RApplication::create(const std::string &appName) {
     if (mCreated.exchange(true)) {
-        return;
+        return false;
     }
     
-    mWindow->create(title);
-}
+    mWindow->create(appName);
 
-void RApplication::run() {
-    if (!mWindow) {
-        LOG_ERROR(tag(), "Window not created")
-        throw std::logic_error("Window not created");
-    }
-
-    init();
-    mainLoop();
-    destroy();
-}
-
-void RApplication::init() {
     LOG_DEBUG(tag(), "RApplication intialization started");
 
-    mVkInstance->create(mWindow->title());
+    mVkInstance->create(appName);
     if (!mVkInstance->isCreated()) {
         throw std::runtime_error("Failed to create Vulkan instance");
     }
+
     LOG_DEBUG(tag(), "RApplication intialization finished");
+
+    return true;
+}
+
+void RApplication::run() {
+    if (!mCreated.load()) {
+        LOG_ERROR(tag(), "First call create then run")
+        throw std::logic_error("First call create then run");
+    }
+
+    mainLoop();
+    destroy();
 }
 
 void RApplication::destroy() {

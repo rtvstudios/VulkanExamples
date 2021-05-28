@@ -200,7 +200,7 @@ VkExtent2D RSwapChain::chooseSwapExtent() {
         return capabilities.currentExtent;
     }
 
-    VkExtent2D actualExtent = {window->height(), window->width()};
+    VkExtent2D actualExtent = {(uint32_t)window->height(), (uint32_t)window->width()};
     actualExtent.width = std::max(capabilities.minImageExtent.width,
                                   std::min(capabilities.maxImageExtent.width,
                                            actualExtent.width));

@@ -127,6 +127,8 @@ void RPhysicalDevice::create() {
 
     mSwapChain->create(graphicsFamily.value(),
                        presentFamily.value());
+
+    vkGetPhysicalDeviceMemoryProperties(mPhysicalDevice, &mMemProperties);
 }
 
 std::string RPhysicalDevice::getAllExtensions(VkPhysicalDevice device) const {

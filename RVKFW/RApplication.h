@@ -21,7 +21,7 @@ class RFramebuffer;
 
 class RApplication: public RObject {
 public:
-    virtual void create(const std::string &title);
+    virtual bool create(const std::string &title);
     void run();
 
     const char * tag() const override {
@@ -45,7 +45,6 @@ protected:
     RApplication();
     ~RApplication();
 
-    virtual void init();
     virtual void draw() const;
     void destroy() override;
 

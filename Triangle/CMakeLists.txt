@@ -1,18 +1,18 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(HelloTriangle)
+project(Triangle)
 
-file (GLOB HelloTriangle_SOURCES CONFIGURE_DEPENDS "*.cpp")
-file (GLOB HelloTriangle_HEADERS CONFIGURE_DEPENDS "*.h")
+file (GLOB Triangle_SOURCES CONFIGURE_DEPENDS "*.cpp")
+file (GLOB Triangle_HEADERS CONFIGURE_DEPENDS "*.h")
 
 set(SHADERS ColoredTriangle.vert ColoredTriangle.frag)
 set(COMPILED_SHADERS ColoredTriangle.vert.spv ColoredTriangle.frag.spv)
 
-add_executable(HelloTriangle ${SHADERS} ${COMPILED_SHADERS} ${HelloTriangle_SOURCES} ${HelloTriangle_HEADERS})
+add_executable(Triangle ${SHADERS} ${COMPILED_SHADERS} ${Triangle_SOURCES} ${Triangle_HEADERS})
 
-target_include_directories(HelloTriangle PUBLIC ${CUSTOM_INCLUDES} "../RVKFW")
+target_include_directories(Triangle PUBLIC ${CUSTOM_INCLUDES} "../RVKFW")
 
-target_link_libraries(HelloTriangle ${CUSTOM_LIBRARIES} "RVKFW")
+target_link_libraries(Triangle ${CUSTOM_LIBRARIES} "RVKFW")
 
 add_compile_definitions(SHADER_DIRECTORY="${CMAKE_CURRENT_BINARY_DIR}")
 
@@ -25,5 +25,5 @@ message(STATUS "Generating build commands for ${CMAKE_CURRENT_BINARY_DIR}/${SHAD
 endforeach()
 
 
-add_dependencies(HelloTriangle RVKFW)
+add_dependencies(Triangle RVKFW)
 
