@@ -5,6 +5,7 @@
 #include "RCommandBuffer.h"
 #include "RGraphicsPipeline.h"
 #include "RVertexBuffer.h"
+#include "RDrawSyncHelper.h"
 
 class HelloTriangle: public rvkfw::RApplication {
 public:
@@ -19,20 +20,13 @@ private:
     void recordDrawCommands();
 
     std::string mShaderDirectory{SHADER_DIRECTORY};
+    
     std::shared_ptr<rvkfw::RRenderPass> mRenderPass;
     std::shared_ptr<rvkfw::RFramebuffer> mFrameBuffer;
     std::shared_ptr<rvkfw::RCommandBuffer> mCommandBuffer;
     std::shared_ptr<rvkfw::RGraphicsPipeline> mGraphicsPipeline;
     std::shared_ptr<rvkfw::RVertexBuffer> mVertexBuffer;
-
-    static const int mMaxFramesInFlight = 2;
-
-    std::vector<VkSemaphore> mImageAvailableSemaphores;
-    std::vector<VkSemaphore> mRenderFinishedSemaphores;
-    
-    mutable std::vector<VkFence> mInFlightFences;
-    mutable std::vector<VkFence> mImagesInFlight;
-    mutable size_t mCurrentFrame = 0;
+    std::shared_ptr<rvkfw::RDrawSyncHelper> mDrawHelper;
 
     uint32_t mVerticesCount = 3;
 };

@@ -27,7 +27,7 @@ uint32_t RVertexBuffer::findMemoryType(const VkPhysicalDeviceMemoryProperties &m
     }
 
     LOG_ERROR(tag(), "Failed to find suitable memory type");
-    throw std::runtime_error("failed to find suitable memory type!");
+    throw std::runtime_error("Failed to find suitable memory type!");
 }
 
 void RVertexBuffer::create(const void *data, int size) {
@@ -60,7 +60,6 @@ void RVertexBuffer::create(const void *data, int size) {
                                                mMemRequirements.memoryTypeBits,
                                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     
-
     if (vkAllocateMemory(logicalDevice->handle(), &allocInfo, nullptr, &mBufferMemory) != VK_SUCCESS) {
         LOG_ERROR(tag(), "Failed to allocate vertex buffer memory!")
         throw std::runtime_error("Failed to allocate vertex buffer memory!");
@@ -76,7 +75,7 @@ void RVertexBuffer::create(const void *data, int size) {
 }
 
 void RVertexBuffer::destroy() {
-    if (!mCreated.exchange(true)) {
+    if (!mCreated.exchange(false)) {
         return;
     }
 

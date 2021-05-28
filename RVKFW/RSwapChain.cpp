@@ -96,9 +96,8 @@ bool RSwapChain::create(uint32_t graphicsFamily, uint32_t presentFamily) {
     createInfo.oldSwapchain = VK_NULL_HANDLE;
 
     if (vkCreateSwapchainKHR(logicalDevice->handle(), &createInfo, nullptr, &mSwapChain) != VK_SUCCESS) {
-        mCreated = false;
         LOG_ERROR(tag(), "Failed to create swap chain!");
-        throw std::runtime_error("failed to create swap chain!");
+        throw std::runtime_error("Failed to create swap chain!");
     }
 
     vkGetSwapchainImagesKHR(logicalDevice->handle(), mSwapChain, &imageCount, nullptr);
