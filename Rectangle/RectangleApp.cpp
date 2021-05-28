@@ -76,10 +76,10 @@ bool RectangleApp::create(const std::string &appName) {
     mIndicesCount = indices.size();
     
     mVertexBuffer = std::make_shared<rvkfw::RVertexBuffer>(physicalDevice(), logicalDevice());
-
     mVertexBuffer->create(vertices.data(), vertices.size() * sizeof(vertices[0]));
 
     mIndexBuffer = std::make_shared<rvkfw::RVertexBuffer>(physicalDevice(), logicalDevice());
+    mIndexBuffer->bufferInfo().usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
     mIndexBuffer->create(indices.data(), indices.size() * sizeof(indices[0]));
 
     auto bindingDescription = Vertex::getBindingDescription();
