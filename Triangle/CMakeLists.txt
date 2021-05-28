@@ -5,8 +5,8 @@ project(Triangle)
 file (GLOB Triangle_SOURCES CONFIGURE_DEPENDS "*.cpp")
 file (GLOB Triangle_HEADERS CONFIGURE_DEPENDS "*.h")
 
-set(SHADERS ColoredTriangle.vert ColoredTriangle.frag)
-set(COMPILED_SHADERS ColoredTriangle.vert.spv ColoredTriangle.frag.spv)
+set(SHADERS Shader.vert Shader.frag)
+set(COMPILED_SHADERS Shader.vert.spv Shader.frag.spv)
 
 add_executable(Triangle ${SHADERS} ${COMPILED_SHADERS} ${Triangle_SOURCES} ${Triangle_HEADERS})
 

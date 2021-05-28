@@ -1,5 +1,5 @@
 
-#include "TriangleApp.h"
+#include "TransformationApp.h"
 #include "RSwapChain.h"
 #include "RLogicalDevice.h"
 #include "RSwapChain.h"
@@ -9,13 +9,13 @@
 #include <array>
 #include <glm/glm.hpp>
 
-TriangleApp::TriangleApp() {
+TransformationApp::TransformationApp() {
 }
 
-TriangleApp::~TriangleApp() {
+TransformationApp::~TransformationApp() {
 }
 
-bool TriangleApp::create(const std::string &appName) {
+bool TransformationApp::create(const std::string &appName) {
     if (!rvkfw::RApplication::create(appName)) {
         return false;
     }
@@ -65,17 +65,22 @@ bool TriangleApp::create(const std::string &appName) {
     };
 
     const std::vector<Vertex> vertices = {
-        {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-        {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}},
-        {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}}
+        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}},
+        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}},
+        {{-0.5f, 0.5f}, {1.0f, 0.0f, 1.0f, 1.0f}}
     };
 
-    mVerticesCount = vertices.size();
+    const std::vector<uint16_t> indices = {0, 1, 2, 0, 2, 3};
+
+    mIndicesCount = indices.size();
     
     mVertexBuffer = std::make_shared<rvkfw::RVertexBuffer>(physicalDevice(), logicalDevice());
+    mVertexBuffer->create(vertices.data(), vertices.size() * sizeof(vertices[0]));
 
-    const void *data = vertices.data();
-    mVertexBuffer->create(data, vertices.size() * sizeof(vertices[0]));
+    mIndexBuffer = std::make_shared<rvkfw::RVertexBuffer>(physicalDevice(), logicalDevice());
+    mIndexBuffer->bufferInfo().usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+    mIndexBuffer->create(indices.data(), indices.size() * sizeof(indices[0]));
 
     auto bindingDescription = Vertex::getBindingDescription();
     auto attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -102,7 +107,7 @@ bool TriangleApp::create(const std::string &appName) {
     return true;
 }
 
-void TriangleApp::recordDrawCommands() {
+void TransformationApp::recordDrawCommands() {
 
     auto commandBuffers = mCommandBuffer->commandBuffers();
     for (size_t i = 0; i < commandBuffers.size(); i++) {
@@ -133,8 +138,9 @@ void TriangleApp::recordDrawCommands() {
         VkBuffer vertexBuffers[] = {mVertexBuffer->handle()};
         VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
+        vkCmdBindIndexBuffer(commandBuffers[i], mIndexBuffer->handle(), 0, VK_INDEX_TYPE_UINT16);
 
-        vkCmdDraw(commandBuffers[i], mVerticesCount, 1, 0, 0);
+        vkCmdDrawIndexed(commandBuffers[i], mIndicesCount, 1, 0, 0, 0);
 
         vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -144,7 +150,7 @@ void TriangleApp::recordDrawCommands() {
     }
 }
 
-void TriangleApp::destroy() {
+void TransformationApp::destroy() {
     if (!mCreated) {
         return;
     }
@@ -158,10 +164,11 @@ void TriangleApp::destroy() {
     mRenderPass = nullptr;
     mFrameBuffer = nullptr;
     mVertexBuffer = nullptr;
+    mIndexBuffer = nullptr;
 
     rvkfw::RApplication::destroy();
 }
 
-void TriangleApp::draw() const {
+void TransformationApp::draw() const {
     mDrawHelper->draw(mCommandBuffer);
 }
