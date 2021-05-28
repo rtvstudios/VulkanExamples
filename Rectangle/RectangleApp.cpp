@@ -68,18 +68,19 @@ bool RectangleApp::create(const std::string &appName) {
         {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}},
         {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}},
         {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}},
-
-        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}},
         {{-0.5f, 0.5f}, {1.0f, 0.0f, 1.0f, 1.0f}}
     };
 
-    mVerticesCount = vertices.size();
+    const std::vector<uint16_t> indices = {0, 1, 2, 0, 2, 3};
+
+    mIndicesCount = indices.size();
     
     mVertexBuffer = std::make_shared<rvkfw::RVertexBuffer>(physicalDevice(), logicalDevice());
 
-    const void *data = vertices.data();
-    mVertexBuffer->create(data, vertices.size() * sizeof(vertices[0]));
+    mVertexBuffer->create(vertices.data(), vertices.size() * sizeof(vertices[0]));
+
+    mIndexBuffer = std::make_shared<rvkfw::RVertexBuffer>(physicalDevice(), logicalDevice());
+    mIndexBuffer->create(indices.data(), indices.size() * sizeof(indices[0]));
 
     auto bindingDescription = Vertex::getBindingDescription();
     auto attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -137,8 +138,9 @@ void RectangleApp::recordDrawCommands() {
         VkBuffer vertexBuffers[] = {mVertexBuffer->handle()};
         VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
+        vkCmdBindIndexBuffer(commandBuffers[i], mIndexBuffer->handle(), 0, VK_INDEX_TYPE_UINT16);
 
-        vkCmdDraw(commandBuffers[i], mVerticesCount, 1, 0, 0);
+        vkCmdDrawIndexed(commandBuffers[i], mIndicesCount, 1, 0, 0, 0);
 
         vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -162,6 +164,7 @@ void RectangleApp::destroy() {
     mRenderPass = nullptr;
     mFrameBuffer = nullptr;
     mVertexBuffer = nullptr;
+    mIndexBuffer = nullptr;
 
     rvkfw::RApplication::destroy();
 }

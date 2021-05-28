@@ -29,9 +29,10 @@ private:
     std::shared_ptr<rvkfw::RCommandBuffer> mCommandBuffer;
     std::shared_ptr<rvkfw::RGraphicsPipeline> mGraphicsPipeline;
     std::shared_ptr<rvkfw::RVertexBuffer> mVertexBuffer;
+    std::shared_ptr<rvkfw::RVertexBuffer> mIndexBuffer;
     std::shared_ptr<rvkfw::RDrawSyncHelper> mDrawHelper;
 
-    uint32_t mVerticesCount;
+    uint32_t mIndicesCount;
 };
 
 #endif
