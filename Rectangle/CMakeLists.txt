@@ -1,17 +1,18 @@
 cmake_minimum_required(VERSION 3.10)
 
-project($PROJECT_NAME)
+project(Rectangle)
 
 file (GLOB SOURCES CONFIGURE_DEPENDS "*.cpp")
 file (GLOB HEADERS CONFIGURE_DEPENDS "*.h")
 
-file(GLOB SHADERS *.frag *.vert)
+set(SHADERS Shader.vert Shader.frag)
+set(COMPILED_SHADERS Shader.vert.spv Shader.frag.spv)
 
-add_executable($PROJECT_NAME ${SHADERS} ${COMPILED_SHADERS} ${HEADERS} ${SOURCES})
+add_executable(Rectangle ${SHADERS} ${COMPILED_SHADERS} ${HEADERS} ${SOURCES})
 
-target_include_directories($PROJECT_NAME PUBLIC ${CUSTOM_INCLUDES} "../RVKFW")
+target_include_directories(Rectangle PUBLIC ${CUSTOM_INCLUDES} "../RVKFW")
 
-target_link_libraries($PROJECT_NAME ${CUSTOM_LIBRARIES} "RVKFW")
+target_link_libraries(Rectangle ${CUSTOM_LIBRARIES} "RVKFW")
 
 add_compile_definitions(SHADER_DIRECTORY="${CMAKE_CURRENT_BINARY_DIR}")
 
@@ -23,4 +24,4 @@ COMMENT "Rebuilding  ${CMAKE_CURRENT_BINARY_DIR}/${SHADER}.spv" )
 message(STATUS "Generating build commands for  ${CMAKE_CURRENT_BINARY_DIR}/${SHADER}.spv")
 endforeach()
 
-add_dependencies($PROJECT_NAME RVKFW)
+add_dependencies(Rectangle RVKFW)

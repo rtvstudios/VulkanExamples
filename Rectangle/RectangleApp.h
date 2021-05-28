@@ -1,4 +1,7 @@
 
+#ifndef RectangleApp_h
+#define RectangleApp_h
+
 #include "RApplication.h"
 #include "RFramebuffer.h"
 #include "RRenderPass.h"
@@ -7,10 +10,10 @@
 #include "RVertexBuffer.h"
 #include "RDrawSyncHelper.h"
 
-class HelloTriangle: public rvkfw::RApplication {
+class RectangleApp: public rvkfw::RApplication {
 public:
-    HelloTriangle();
-    ~HelloTriangle();
+    RectangleApp();
+    ~RectangleApp();
 
     bool create(const std::string &appName) override;
     void draw() const override;
@@ -28,5 +31,8 @@ private:
     std::shared_ptr<rvkfw::RVertexBuffer> mVertexBuffer;
     std::shared_ptr<rvkfw::RDrawSyncHelper> mDrawHelper;
 
-    uint32_t mVerticesCount = 3;
+    uint32_t mVerticesCount;
 };
+
+#endif
+

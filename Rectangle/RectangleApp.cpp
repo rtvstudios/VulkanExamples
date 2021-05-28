@@ -1,5 +1,5 @@
 
-#include "HelloTriangleApp.h"
+#include "RectangleApp.h"
 #include "RSwapChain.h"
 #include "RLogicalDevice.h"
 #include "RSwapChain.h"
@@ -9,13 +9,13 @@
 #include <array>
 #include <glm/glm.hpp>
 
-HelloTriangle::HelloTriangle() {
+RectangleApp::RectangleApp() {
 }
 
-HelloTriangle::~HelloTriangle() {
+RectangleApp::~RectangleApp() {
 }
 
-bool HelloTriangle::create(const std::string &appName) {
+bool RectangleApp::create(const std::string &appName) {
     if (!rvkfw::RApplication::create(appName)) {
         return false;
     }
@@ -65,9 +65,13 @@ bool HelloTriangle::create(const std::string &appName) {
     };
 
     const std::vector<Vertex> vertices = {
-        {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-        {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}},
-        {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}}
+        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}},
+        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}},
+
+        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}},
+        {{-0.5f, 0.5f}, {1.0f, 0.0f, 1.0f, 1.0f}}
     };
 
     mVerticesCount = vertices.size();
@@ -86,8 +90,8 @@ bool HelloTriangle::create(const std::string &appName) {
     mGraphicsPipeline->vertexInputInfo().pVertexBindingDescriptions = &bindingDescription;
     mGraphicsPipeline->vertexInputInfo().pVertexAttributeDescriptions = attributeDescriptions.data();
 
-    mGraphicsPipeline->create(mShaderDirectory + "/ColoredTriangle.vert.spv",
-                              mShaderDirectory + "/ColoredTriangle.frag.spv");
+    mGraphicsPipeline->create(mShaderDirectory + "/Shader.vert.spv",
+                              mShaderDirectory + "/Shader.frag.spv");
     
     mCommandBuffer = std::make_shared<rvkfw::RCommandBuffer>(mRenderPass, swapChain(),
                                                              logicalDevice(), mFrameBuffer, mGraphicsPipeline,
@@ -102,7 +106,7 @@ bool HelloTriangle::create(const std::string &appName) {
     return true;
 }
 
-void HelloTriangle::recordDrawCommands() {
+void RectangleApp::recordDrawCommands() {
 
     auto commandBuffers = mCommandBuffer->commandBuffers();
     for (size_t i = 0; i < commandBuffers.size(); i++) {
@@ -144,7 +148,7 @@ void HelloTriangle::recordDrawCommands() {
     }
 }
 
-void HelloTriangle::destroy() {
+void RectangleApp::destroy() {
     if (!mCreated) {
         return;
     }
@@ -162,6 +166,6 @@ void HelloTriangle::destroy() {
     rvkfw::RApplication::destroy();
 }
 
-void HelloTriangle::draw() const {
+void RectangleApp::draw() const {
     mDrawHelper->draw(mCommandBuffer);
 }
