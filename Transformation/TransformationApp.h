@@ -66,7 +66,10 @@ private:
     float mEndScale{0};
 
     int64_t mStartTime{0};
-    float mDuration{3000.0f};
+    static constexpr float mDuration{3000.0f};
+
+    int64_t mScaleStartTime{0};
+    static constexpr float mScaleDuration{mDuration/2.0f};
 
     const std::vector<uint16_t> indices = {0, 1, 2, 0, 2, 3};
 };

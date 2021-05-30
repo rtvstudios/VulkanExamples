@@ -188,21 +188,18 @@ void TransformationApp::updateTransformation(uint32_t imageIndex) {
 
     if (t > 1.0f) {
         mStartPos = mEndPos;
+        if (mEndPos.y > 0) {
+            mEndPos.y = (-0.75f);
+        } else {
+            mEndPos.y = (0.75f);
+        }
         mEndPos.x = getRandom(-0.75f, 0.75f);
-        mEndPos.y = getRandom(-0.75f, 0.75f);
 
         mStartAngle = mEndAngle;
         if (mEndAngle < 1.0f) {
-            mEndAngle = glm::pi<float>();
+            mEndAngle = 2.0f * glm::pi<float>();
         } else {
             mEndAngle = 0.0f;
-        }
-
-        mStartScale = mEndScale;
-        if (mEndScale > 0.5f) {
-            mEndScale = 0.25f;
-        } else {
-            mEndScale = 1.0f;
         }
 
         mStartTime = currentWallTimeTickCount();
@@ -211,8 +208,27 @@ void TransformationApp::updateTransformation(uint32_t imageIndex) {
     }
 
     auto translation = mStartPos * (1-t) + mEndPos * t;
-    auto scale = mStartScale * (1-t) + mEndScale * t;
     auto rotation = mStartAngle * (1-t) + mEndAngle * t;
+
+    float scale;
+    {
+
+        float t = (currentWallTimeTickCount() - mScaleStartTime) / mScaleDuration;
+
+        if (t > 1.0f) {
+            mStartScale = mEndScale;
+            if (mEndScale > 1.0f) {
+                mEndScale = 0.5f;
+            } else {
+                mEndScale = 1.5f;
+            }
+            mScaleStartTime = currentWallTimeTickCount();
+            t = (currentWallTimeTickCount() - mScaleStartTime) / mScaleDuration;
+        }
+
+        scale = mStartScale * (1-t) + mEndScale * t;
+    }
+
 
     mTransformation.translation = glm::translate(translation);
     mTransformation.scale = glm::scale(glm::vec3(scale));
