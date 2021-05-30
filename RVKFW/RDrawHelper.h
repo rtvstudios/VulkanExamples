@@ -1,6 +1,6 @@
 
-#ifndef RDrawSyncHelper_h
-#define RDrawSyncHelper_h
+#ifndef RDrawHelper_h
+#define RDrawHelper_h
 
 #include "RObject.h"
 
@@ -11,14 +11,14 @@ class RLogicalDevice;
 class RSwapChain;
 class RCommandBuffer;
 
-class RDrawSyncHelper: public RObject {
+class RDrawHelper: public RObject {
 public:
-    RDrawSyncHelper(std::weak_ptr<RLogicalDevice> logicalDevice,
+    RDrawHelper(std::weak_ptr<RLogicalDevice> logicalDevice,
                     std::weak_ptr<RSwapChain> swapChain) :
         mLogicalDevice{logicalDevice}, mSwapChain{swapChain} {
     }
 
-    ~RDrawSyncHelper();
+    ~RDrawHelper();
 
     void create(int framesInFlight);
     
@@ -40,7 +40,12 @@ public:
         return mInFlightFences;
     }
 
-    void draw(const std::shared_ptr<RCommandBuffer> &commandBuffer) const;
+    int drawIndex() const {
+        return mCurrentFrame;
+    }
+
+    void draw(const std::shared_ptr<RCommandBuffer> &commandBuffer,
+              std::function<void(uint32_t)> onDrawStart = nullptr) const;
 
 protected:
     std::weak_ptr<RLogicalDevice> mLogicalDevice;

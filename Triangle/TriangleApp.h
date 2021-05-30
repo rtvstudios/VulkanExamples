@@ -8,7 +8,7 @@
 #include "RCommandBuffer.h"
 #include "RGraphicsPipeline.h"
 #include "RVertexBuffer.h"
-#include "RDrawSyncHelper.h"
+#include "RDrawHelper.h"
 
 class TriangleApp: public rvkfw::RApplication {
 public:
@@ -29,7 +29,7 @@ private:
     std::shared_ptr<rvkfw::RCommandBuffer> mCommandBuffer;
     std::shared_ptr<rvkfw::RGraphicsPipeline> mGraphicsPipeline;
     std::shared_ptr<rvkfw::RVertexBuffer> mVertexBuffer;
-    std::shared_ptr<rvkfw::RDrawSyncHelper> mDrawHelper;
+    std::shared_ptr<rvkfw::RDrawHelper> mDrawHelper;
 
     uint32_t mVerticesCount = 3;
 };

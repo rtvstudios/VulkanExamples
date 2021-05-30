@@ -1,5 +1,5 @@
 
-#include "RDrawSyncHelper.h"
+#include "RDrawHelper.h"
 #include "RLogicalDevice.h"
 #include "RSwapChain.h"
 #include "RCommandBuffer.h"
@@ -7,11 +7,11 @@
 
 namespace rvkfw {
 
-RDrawSyncHelper::~RDrawSyncHelper() {
+RDrawHelper::~RDrawHelper() {
     destroy();
 }
 
-void RDrawSyncHelper::destroy() {
+void RDrawHelper::destroy() {
     if (!mCreated.exchange(false)) {
         return;
     }
@@ -36,7 +36,7 @@ void RDrawSyncHelper::destroy() {
     mImagesInFlight.clear();
 }
 
-void RDrawSyncHelper::create(int framesInFlight) {
+void RDrawHelper::create(int framesInFlight) {
     if (mCreated.exchange(true)) {
         return;
     }
@@ -71,7 +71,8 @@ void RDrawSyncHelper::create(int framesInFlight) {
     }
 }
 
-void RDrawSyncHelper::draw(const std::shared_ptr<RCommandBuffer> &commandBuffer) const {
+void RDrawHelper::draw(const std::shared_ptr<RCommandBuffer> &commandBuffer,
+                       std::function<void(uint32_t)> onDrawStart) const {
     auto logicalDevice = mLogicalDevice.lock();
     ASSERT_NOT_NULL(logicalDevice);
 
@@ -89,6 +90,10 @@ void RDrawSyncHelper::draw(const std::shared_ptr<RCommandBuffer> &commandBuffer)
         vkWaitForFences(logicalDevice->handle(), 1, &mImagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
     }
     mImagesInFlight[imageIndex] = mInFlightFences[mCurrentFrame];
+    
+    if (onDrawStart) {
+        onDrawStart(imageIndex);
+    }
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

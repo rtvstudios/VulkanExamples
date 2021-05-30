@@ -35,8 +35,6 @@ void RVertexBuffer::create(const void *data, int size) {
         return;
     }
 
-    ASSERT_NOT_NULL(data);
-
     mBufferInfo.size = size;
 
     auto logicalDevice = mLogicalDevice.lock();
@@ -58,8 +56,8 @@ void RVertexBuffer::create(const void *data, int size) {
     allocInfo.allocationSize = mMemRequirements.size;
     allocInfo.memoryTypeIndex = findMemoryType(physicalDevice->memProperties(),
                                                mMemRequirements.memoryTypeBits,
-                                               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-    
+                                               mMemoryProperties);
+
     if (vkAllocateMemory(logicalDevice->handle(), &allocInfo, nullptr, &mBufferMemory) != VK_SUCCESS) {
         LOG_ERROR(tag(), "Failed to allocate vertex buffer memory!")
         throw std::runtime_error("Failed to allocate vertex buffer memory!");
@@ -67,12 +65,25 @@ void RVertexBuffer::create(const void *data, int size) {
 
     vkBindBufferMemory(logicalDevice->handle(), mBuffer, mBufferMemory, 0);
 
-    void* mappedArea;
-    vkMapMemory(logicalDevice->handle(), mBufferMemory, 0, mBufferInfo.size, 0, &mappedArea);
-    memcpy(mappedArea, data, (size_t) mBufferInfo.size);
-
-    vkUnmapMemory(logicalDevice->handle(), mBufferMemory);
+    if (data) {
+        setData(data, size);
+    }
 }
+
+void RVertexBuffer::setData(const void *data, int size) {
+    auto logicalDevice = mLogicalDevice.lock();
+    ASSERT_NOT_NULL(logicalDevice);
+
+    if (data) {
+        void* mappedArea;
+        vkMapMemory(logicalDevice->handle(), mBufferMemory, 0, mBufferInfo.size, 0, &mappedArea);
+        memcpy(mappedArea, data, (size_t) mBufferInfo.size);
+
+        vkUnmapMemory(logicalDevice->handle(), mBufferMemory);
+    }
+
+}
+
 
 void RVertexBuffer::destroy() {
     if (!mCreated.exchange(false)) {

@@ -5,9 +5,7 @@
 #include "RSwapChain.h"
 #include "RQueue.h"
 #include "RWindow.h"
-
-#include <array>
-#include <glm/glm.hpp>
+#include "RLogger.h"
 
 TransformationApp::TransformationApp() {
 }
@@ -65,15 +63,11 @@ bool TransformationApp::create(const std::string &appName) {
     };
 
     const std::vector<Vertex> vertices = {
-        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}},
-        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}},
-        {{-0.5f, 0.5f}, {1.0f, 0.0f, 1.0f, 1.0f}}
+        {{-0.25f, -0.25f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+        {{0.25f, -0.25f}, {0.0f, 1.0f, 0.0f, 1.0f}},
+        {{0.25f, 0.25f}, {0.0f, 0.0f, 1.0f, 1.0f}},
+        {{-0.25f, 0.25f}, {1.0f, 0.0f, 1.0f, 1.0f}}
     };
-
-    const std::vector<uint16_t> indices = {0, 1, 2, 0, 2, 3};
-
-    mIndicesCount = indices.size();
     
     mVertexBuffer = std::make_shared<rvkfw::RVertexBuffer>(physicalDevice(), logicalDevice());
     mVertexBuffer->create(vertices.data(), vertices.size() * sizeof(vertices[0]));
@@ -84,6 +78,13 @@ bool TransformationApp::create(const std::string &appName) {
 
     auto bindingDescription = Vertex::getBindingDescription();
     auto attributeDescriptions = Vertex::getAttributeDescriptions();
+
+    mDescriptorPool = std::make_shared<rvkfw::RDescriptorPool>(physicalDevice(), logicalDevice(), swapChain());
+    mDescriptorPool->create(swapChain()->images().size(),
+                            std::vector<uint32_t>(swapChain()->images().size(), sizeof(Transformations)));
+
+    mGraphicsPipeline->pipelineLayoutInfo().setLayoutCount = 1;
+    mGraphicsPipeline->pipelineLayoutInfo().pSetLayouts = mDescriptorPool->descriptorSetLayout();
 
     mGraphicsPipeline->vertexInputInfo().vertexBindingDescriptionCount = 1;
     mGraphicsPipeline->vertexInputInfo().vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
@@ -99,10 +100,12 @@ bool TransformationApp::create(const std::string &appName) {
                                                              commandPool());
     mCommandBuffer->create();
 
-    mDrawHelper = std::make_shared<rvkfw::RDrawSyncHelper>(logicalDevice(), swapChain());
+    mDrawHelper = std::make_shared<rvkfw::RDrawHelper>(logicalDevice(), swapChain());
     mDrawHelper->create(2);
 
     recordDrawCommands();
+
+    std::srand(std::time(nullptr));
 
     return true;
 }
@@ -140,7 +143,11 @@ void TransformationApp::recordDrawCommands() {
         vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
         vkCmdBindIndexBuffer(commandBuffers[i], mIndexBuffer->handle(), 0, VK_INDEX_TYPE_UINT16);
 
-        vkCmdDrawIndexed(commandBuffers[i], mIndicesCount, 1, 0, 0, 0);
+        vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                mGraphicsPipeline->pipelineLayout(), 0, 1,
+                                &mDescriptorPool->descriptorSets()[i], 0, nullptr);
+
+        vkCmdDrawIndexed(commandBuffers[i], indices.size(), 1, 0, 0, 0);
 
         vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -165,10 +172,59 @@ void TransformationApp::destroy() {
     mFrameBuffer = nullptr;
     mVertexBuffer = nullptr;
     mIndexBuffer = nullptr;
+    mDescriptorPool = nullptr;
 
     rvkfw::RApplication::destroy();
 }
 
+float TransformationApp::getRandom(float start, float end) const {
+    auto rn = std::rand() % (1000+1);
+    float t = rn / 1000.0f;
+    return start * (1.0f-t) + end * t;
+}
+
+void TransformationApp::updateTransformation(uint32_t imageIndex) {
+    float t = (currentWallTimeTickCount() - mStartTime) / mDuration;
+
+    if (t > 1.0f) {
+        mStartPos = mEndPos;
+        mEndPos.x = getRandom(-0.75f, 0.75f);
+        mEndPos.y = getRandom(-0.75f, 0.75f);
+
+        mStartAngle = mEndAngle;
+        if (mEndAngle < 1.0f) {
+            mEndAngle = glm::pi<float>();
+        } else {
+            mEndAngle = 0.0f;
+        }
+
+        mStartScale = mEndScale;
+        if (mEndScale > 0.5f) {
+            mEndScale = 0.25f;
+        } else {
+            mEndScale = 1.0f;
+        }
+
+        mStartTime = currentWallTimeTickCount();
+
+        t = (currentWallTimeTickCount() - mStartTime) / mDuration;
+    }
+
+    auto translation = mStartPos * (1-t) + mEndPos * t;
+    auto scale = mStartScale * (1-t) + mEndScale * t;
+    auto rotation = mStartAngle * (1-t) + mEndAngle * t;
+
+    mTransformation.translation = glm::translate(translation);
+    mTransformation.scale = glm::scale(glm::vec3(scale));
+    mTransformation.rotation = glm::rotate(rotation, glm::vec3(0, 0, 1));
+
+    imageIndex = imageIndex % mDescriptorPool->buffersCount();
+    auto buffer = mDescriptorPool->buffer(imageIndex);
+    buffer->setData(&mTransformation, sizeof(Transformations));
+}
+
 void TransformationApp::draw() const {
-    mDrawHelper->draw(mCommandBuffer);
+    mDrawHelper->draw(mCommandBuffer, [this](uint32_t imageIndex) {
+        const_cast<TransformationApp *>(this)->updateTransformation(imageIndex);
+    });
 }

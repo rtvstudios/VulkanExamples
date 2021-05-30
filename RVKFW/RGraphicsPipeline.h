@@ -82,6 +82,11 @@ public:
         return mGraphicsPipeline;
     }
 
+    VkPipelineLayout pipelineLayout() const {
+        return mPipelineLayout;
+    }
+
+
 protected:
     std::weak_ptr<RRenderPass> mRenderPass;
     std::weak_ptr<RSwapChain> mSwapChain;

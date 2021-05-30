@@ -8,7 +8,7 @@
 #include "RCommandBuffer.h"
 #include "RGraphicsPipeline.h"
 #include "RVertexBuffer.h"
-#include "RDrawSyncHelper.h"
+#include "RDrawHelper.h"
 
 class RectangleApp: public rvkfw::RApplication {
 public:
@@ -30,9 +30,9 @@ private:
     std::shared_ptr<rvkfw::RGraphicsPipeline> mGraphicsPipeline;
     std::shared_ptr<rvkfw::RVertexBuffer> mVertexBuffer;
     std::shared_ptr<rvkfw::RVertexBuffer> mIndexBuffer;
-    std::shared_ptr<rvkfw::RDrawSyncHelper> mDrawHelper;
+    std::shared_ptr<rvkfw::RDrawHelper> mDrawHelper;
 
-    uint32_t mIndicesCount;
+    const std::vector<uint16_t> indices = {0, 1, 2, 0, 2, 3};
 };
 
 #endif

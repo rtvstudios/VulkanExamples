@@ -41,14 +41,14 @@ private:
 
 }
 
-#define DO_LOG(type, tag, message) { RLogger(type, tag).stream() << message; }
+#define DO_LOG(type, tag, message) { rvkfw::RLogger(type, tag).stream() << message; }
 
-#define LOG_INFO(tag, message) DO_LOG(RLogger::Type::Info, tag, message)
-#define LOG_WARN(tag, message) DO_LOG(RLogger::Type::Warning, tag, message)
-#define LOG_ERROR(tag, message) DO_LOG(RLogger::Type::Error, tag, message)
+#define LOG_INFO(tag, message) DO_LOG(rvkfw::RLogger::Type::Info, tag, message)
+#define LOG_WARN(tag, message) DO_LOG(rvkfw::RLogger::Type::Warning, tag, message)
+#define LOG_ERROR(tag, message) DO_LOG(rvkfw::RLogger::Type::Error, tag, message)
 
 #ifdef DEBUG
-#define LOG_DEBUG(tag, message) DO_LOG(RLogger::Type::Debug, tag, message)
+#define LOG_DEBUG(tag, message) DO_LOG(rvkfw::RLogger::Type::Debug, tag, message)
 #else
 #define LOG_DEBUG(tag, message)
 #endif

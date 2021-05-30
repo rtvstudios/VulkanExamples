@@ -20,6 +20,7 @@ public:
 
     void create(const void *data, int size);
     void destroy() override;
+    void setData(const void *data, int size);
 
     const char * tag() const override {
         return "RVertexBuffer";
@@ -37,6 +38,10 @@ public:
         return mMemRequirements;
     }
 
+    void setMemoryProperties(const VkMemoryPropertyFlags &value) {
+        mMemoryProperties = value;
+    }
+    
 protected:
     uint32_t findMemoryType(const VkPhysicalDeviceMemoryProperties &memProperties,
                             uint32_t typeFilter, VkMemoryPropertyFlags properties);
@@ -49,6 +54,8 @@ protected:
 
     VkBuffer mBuffer{ VK_NULL_HANDLE };
     VkDeviceMemory mBufferMemory{ VK_NULL_HANDLE };
+
+    VkMemoryPropertyFlags mMemoryProperties{VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
 };
 
 }

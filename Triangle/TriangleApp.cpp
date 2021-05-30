@@ -94,7 +94,7 @@ bool TriangleApp::create(const std::string &appName) {
                                                              commandPool());
     mCommandBuffer->create();
 
-    mDrawHelper = std::make_shared<rvkfw::RDrawSyncHelper>(logicalDevice(), swapChain());
+    mDrawHelper = std::make_shared<rvkfw::RDrawHelper>(logicalDevice(), swapChain());
     mDrawHelper->create(2);
 
     recordDrawCommands();
