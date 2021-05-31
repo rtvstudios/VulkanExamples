@@ -66,7 +66,7 @@ private:
     float mEndScale{0};
 
     int64_t mStartTime{0};
-    static constexpr float mDuration{3000.0f};
+    static constexpr float mDuration{5000.0f};
 
     int64_t mScaleStartTime{0};
     static constexpr float mScaleDuration{mDuration/2.0f};
