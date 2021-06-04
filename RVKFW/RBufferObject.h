@@ -1,6 +1,6 @@
 
-#ifndef RVertexBuffer_h
-#define RVertexBuffer_h
+#ifndef RBufferObject_h
+#define RBufferObject_h
 
 #include "RObject.h"
 
@@ -11,8 +11,8 @@ class RPhysicalDevice;
 
 class RBufferObject: public RObject {
 public:
-    RBufferObject(std::shared_ptr<RPhysicalDevice> physicalDevice,
-                  std::shared_ptr<RLogicalDevice> logicalDevice);
+    RBufferObject(std::weak_ptr<RPhysicalDevice> physicalDevice,
+                  std::weak_ptr<RLogicalDevice> logicalDevice);
 
     ~RBufferObject() {
         destroy();
@@ -41,11 +41,11 @@ public:
     void setMemoryProperties(const VkMemoryPropertyFlags &value) {
         mMemoryProperties = value;
     }
-    
-protected:
+
     uint32_t findMemoryType(const VkPhysicalDeviceMemoryProperties &memProperties,
                             uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
+protected:
     std::weak_ptr<RLogicalDevice> mLogicalDevice;
     std::weak_ptr<RPhysicalDevice> mPhysicalDevice;
 
@@ -56,6 +56,38 @@ protected:
     VkDeviceMemory mBufferMemory{ VK_NULL_HANDLE };
 
     VkMemoryPropertyFlags mMemoryProperties{VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
+
+public:
+    class Creator {
+    public:
+        Creator(std::weak_ptr<RPhysicalDevice> physicalDevice,
+                std::weak_ptr<RLogicalDevice> logicalDevice) :
+            mObject{std::make_shared<RBufferObject>(physicalDevice, logicalDevice)} {
+                mObject->preCreate();
+        }
+
+        VkBufferCreateInfo &bufferInfo() {
+            return mObject->bufferInfo();
+        }
+
+        VkMemoryRequirements &memRequirements() {
+            return mObject->memRequirements();
+        }
+
+        Creator &setMemoryProperties(const VkMemoryPropertyFlags &value) {
+            mObject->setMemoryProperties(value);
+            return *this;
+        }
+
+        std::shared_ptr<RBufferObject> create(const void *data, int size) {
+            mObject->create(data, size);
+            return mObject;
+        }
+
+    private:
+        std::shared_ptr<RBufferObject> mObject;
+    };
+    friend Creator;
 };
 
 }

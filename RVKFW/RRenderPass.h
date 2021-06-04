@@ -60,6 +60,43 @@ protected:
     VkRenderPassCreateInfo mRenderPassInfo{};
     VkSubpassDependency mDependency{};
 
+public:
+    class Creator {
+    public:
+        Creator(std::weak_ptr<RLogicalDevice> logicalDevice,
+                std::weak_ptr<RSwapChain> swapChain) :
+            mObject{std::make_shared<RRenderPass>(logicalDevice, swapChain)} {
+                mObject->preCreate();
+        }
+
+        std::shared_ptr<RRenderPass> create() {
+            mObject->create();
+            return mObject;
+        }
+
+        std::vector<VkAttachmentDescription> &colorAttachments() {
+            return mObject->colorAttachments();
+        }
+
+        VkAttachmentReference &colorAttachmentRef() {
+            return mObject->colorAttachmentRef();
+        }
+
+        std::vector<VkSubpassDescription> &subpass() {
+            return mObject->subpass();
+        }
+
+        VkRenderPassCreateInfo &renderPassInfo() {
+            return mObject->renderPassInfo();
+        }
+
+        VkSubpassDependency &dependency() {
+            return mObject->dependency();
+        }
+
+    private:
+        std::shared_ptr<RRenderPass> mObject;
+    };
 };
 
 }

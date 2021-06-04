@@ -16,12 +16,6 @@ class RGraphicsPipeline;
 
 class RCommandBuffer: public RObject {
 public:
-    struct RecordImageParams {
-        int index;
-        VkRenderPassBeginInfo renderPassInfo;
-        VkCommandBuffer commandBuffer;
-        RGraphicsPipeline *graphicsPipeline;
-    };
 
     RCommandBuffer(std::weak_ptr<RRenderPass> renderPass,
                    std::weak_ptr<RSwapChain> swapChain,
@@ -60,6 +54,35 @@ protected:
     VkCommandBufferAllocateInfo mAllocInfo{};
 
     std::vector<VkCommandBuffer> mCommandBuffers;
+
+public:
+    class Creator {
+    public:
+        Creator(std::weak_ptr<RRenderPass> renderPass,
+                std::weak_ptr<RSwapChain> swapChain,
+                std::weak_ptr<RLogicalDevice> logicalDevice,
+                std::weak_ptr<RFramebuffer> framebuffer,
+                std::weak_ptr<RGraphicsPipeline> graphicsPipeline,
+                std::weak_ptr<RCommandPool> commandPool) :
+            mObject{std::make_shared<RCommandBuffer>(renderPass, swapChain, logicalDevice,
+                                                     framebuffer, graphicsPipeline, commandPool)} {
+                mObject->preCreate();
+        }
+
+        VkCommandBufferAllocateInfo &allocInfo() {
+            return mObject->allocInfo();
+        }
+
+        std::shared_ptr<RCommandBuffer> create() {
+            mObject->create();
+            return mObject;
+        }
+
+    private:
+        std::shared_ptr<RCommandBuffer> mObject;
+
+    };
+        
 };
 
 }

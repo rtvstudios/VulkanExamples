@@ -6,8 +6,8 @@
 
 namespace rvkfw {
 
-RBufferObject::RBufferObject(std::shared_ptr<RPhysicalDevice> physicalDevice,
-                             std::shared_ptr<RLogicalDevice> logicalDevice) :
+RBufferObject::RBufferObject(std::weak_ptr<RPhysicalDevice> physicalDevice,
+                             std::weak_ptr<RLogicalDevice> logicalDevice) :
     mPhysicalDevice{physicalDevice},
     mLogicalDevice{logicalDevice} {
 

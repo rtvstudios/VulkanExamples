@@ -3,6 +3,7 @@
 #include "RLogicalDevice.h"
 #include "RSwapChain.h"
 #include "RCommandBuffer.h"
+#include "RCommandPool.h"
 #include "RQueue.h"
 
 namespace rvkfw {
@@ -132,6 +133,51 @@ void RDrawHelper::draw(const std::shared_ptr<RCommandBuffer> &commandBuffer,
     vkQueuePresentKHR(logicalDevice->presentQueue()->handle(), &presentInfo);
 
     mCurrentFrame = (mCurrentFrame + 1) % mMaxFramesInFlight;
+}
+
+VkCommandBuffer RDrawHelper::beginSingleTimeCommands() {
+    auto commandPool = mCommandPool.lock();
+    ASSERT_NOT_NULL(commandPool);
+
+    auto logicalDevice = mLogicalDevice.lock();
+    ASSERT_NOT_NULL(logicalDevice);
+
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = commandPool->handle();
+    allocInfo.commandBufferCount = 1;
+
+    VkCommandBuffer commandBuffer;
+    vkAllocateCommandBuffers(logicalDevice->handle(), &allocInfo, &commandBuffer);
+
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+    return commandBuffer;
+}
+
+void RDrawHelper::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
+    auto commandPool = mCommandPool.lock();
+    ASSERT_NOT_NULL(commandPool);
+
+    auto logicalDevice = mLogicalDevice.lock();
+    ASSERT_NOT_NULL(logicalDevice);
+
+    vkEndCommandBuffer(commandBuffer);
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    vkQueueSubmit(logicalDevice->graphicsQueue()->handle(), 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(logicalDevice->graphicsQueue()->handle());
+
+    vkFreeCommandBuffers(logicalDevice->handle(), commandPool->handle(), 1, &commandBuffer);
 }
 
 }

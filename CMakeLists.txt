@@ -38,5 +38,5 @@ add_subdirectory(RVKFW)
 add_subdirectory(Triangle)
 add_subdirectory(Rectangle)
 add_subdirectory(Transformation)
-
+add_subdirectory(Texture)
 

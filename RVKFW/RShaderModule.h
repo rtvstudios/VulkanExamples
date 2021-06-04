@@ -28,12 +28,39 @@ public:
         return mModule;
     }
 
+    VkShaderModuleCreateInfo &createInfo() {
+        return mCreateInfo;
+    }
+
 protected:
     std::vector<char> readFile(const std::string& filename);
 
     std::weak_ptr<RLogicalDevice> mLogicalDevice;
-    
+
+    VkShaderModuleCreateInfo mCreateInfo{};
+
     VkShaderModule mModule{ VK_NULL_HANDLE };
+
+public:
+    class Creator {
+    public:
+        Creator(std::weak_ptr<RLogicalDevice> logicalDevice) :
+            mObject{std::make_shared<RShaderModule>(logicalDevice)} {
+                mObject->preCreate();
+        }
+
+        std::shared_ptr<RShaderModule> create(const std::string &shaderFile) {
+            mObject->create(shaderFile);
+            return mObject;
+        }
+
+        VkShaderModuleCreateInfo &createInfo() {
+            return mObject->createInfo();
+        }
+
+    private:
+        std::shared_ptr<RShaderModule> mObject;
+    };
 };
 
 }

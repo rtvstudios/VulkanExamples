@@ -17,12 +17,11 @@ void RShaderModule::create(const std::string &shaderFile) {
     
     auto code = readFile(shaderFile);
 
-    VkShaderModuleCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    createInfo.codeSize = code.size();
-    createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+    mCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    mCreateInfo.codeSize = code.size();
+    mCreateInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
-    if (vkCreateShaderModule(logicalDevice->handle(), &createInfo, nullptr, &mModule) != VK_SUCCESS) {
+    if (vkCreateShaderModule(logicalDevice->handle(), &mCreateInfo, nullptr, &mModule) != VK_SUCCESS) {
         LOG_ERROR(tag(), "failed to create shader module!");
         throw std::runtime_error("failed to create shader module!");
     }

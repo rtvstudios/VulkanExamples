@@ -23,6 +23,7 @@ protected:
     std::atomic_bool mCreated{ false };
 };
 
+
 }
 
 #endif

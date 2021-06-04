@@ -5,6 +5,14 @@
 
 namespace rvkfw {
 
+RCommandPool::RCommandPool(std::shared_ptr<RLogicalDevice> logicalDevice) :
+    mLogicalDevice{logicalDevice} {
+
+    mCreatePoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    mCreatePoolInfo.queueFamilyIndex = logicalDevice->graphicsQueue()->index();
+    mCreatePoolInfo.flags = 0;
+}
+
 RCommandPool::~RCommandPool() {
     destroy();
 }
@@ -32,12 +40,7 @@ void RCommandPool::create() {
     auto logicalDevice = mLogicalDevice.lock();
     ASSERT_NOT_NULL(logicalDevice);
 
-    VkCommandPoolCreateInfo poolInfo{};
-    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    poolInfo.queueFamilyIndex = logicalDevice->graphicsQueue()->index();
-    poolInfo.flags = 0;
-
-    if (vkCreateCommandPool(logicalDevice->handle(), &poolInfo, nullptr, &mCommandPool) != VK_SUCCESS) {
+    if (vkCreateCommandPool(logicalDevice->handle(), &mCreatePoolInfo, nullptr, &mCommandPool) != VK_SUCCESS) {
         LOG_ERROR(tag(), "Failed to create command pool!");
         throw std::runtime_error("failed to create command pool!");
     }

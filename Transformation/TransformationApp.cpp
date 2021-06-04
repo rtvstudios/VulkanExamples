@@ -18,20 +18,17 @@ bool TransformationApp::create(const std::string &appName) {
         return false;
     }
 
-    mRenderPass = std::make_shared<rvkfw::RRenderPass>(logicalDevice(), swapChain());
-    mRenderPass->create();
+    mRenderPass = rvkfw::RRenderPass::Creator(logicalDevice(), swapChain()).create();
 
-    mFrameBuffer = std::make_shared<rvkfw::RFramebuffer>(mRenderPass, swapChain(), logicalDevice());
-    mFrameBuffer->create();
+    mFrameBuffer = rvkfw::RFramebuffer::Creator(mRenderPass, swapChain(), logicalDevice()).create();
 
-    mGraphicsPipeline = std::make_shared<rvkfw::RGraphicsPipeline>(logicalDevice(), mRenderPass, swapChain());
-    mGraphicsPipeline->preCreate();
+    auto graphicsPipelineCreator = rvkfw::RGraphicsPipeline::Creator(logicalDevice(), mRenderPass, swapChain());
+
+    graphicsPipelineCreator.inputAssembly().topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     
-    mGraphicsPipeline->inputAssembly().topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-    
-    mGraphicsPipeline->rasterizer().cullMode = VK_CULL_MODE_BACK_BIT;
-    mGraphicsPipeline->rasterizer().frontFace = VK_FRONT_FACE_CLOCKWISE;
-    mGraphicsPipeline->rasterizer().polygonMode = VK_POLYGON_MODE_FILL;
+    graphicsPipelineCreator.rasterizer().cullMode = VK_CULL_MODE_BACK_BIT;
+    graphicsPipelineCreator.rasterizer().frontFace = VK_FRONT_FACE_CLOCKWISE;
+    graphicsPipelineCreator.rasterizer().polygonMode = VK_POLYGON_MODE_FILL;
 
     struct Vertex {
         glm::vec2 pos;
@@ -69,39 +66,37 @@ bool TransformationApp::create(const std::string &appName) {
         {{-0.25f, 0.25f}, {1.0f, 0.0f, 1.0f, 1.0f}}
     };
     
-    mVertexBuffer = std::make_shared<rvkfw::RVertexBuffer>(physicalDevice(), logicalDevice());
-    mVertexBuffer->create(vertices.data(), vertices.size() * sizeof(vertices[0]));
+    mVertexBuffer = rvkfw::RBufferObject::Creator(physicalDevice(), logicalDevice()).
+                        create(vertices.data(), vertices.size() * sizeof(vertices[0]));
 
-    mIndexBuffer = std::make_shared<rvkfw::RVertexBuffer>(physicalDevice(), logicalDevice());
-    mIndexBuffer->bufferInfo().usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-    mIndexBuffer->create(indices.data(), indices.size() * sizeof(indices[0]));
+    auto indexBuffer = rvkfw::RBufferObject::Creator(physicalDevice(), logicalDevice());
+    indexBuffer.bufferInfo().usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+    mIndexBuffer = indexBuffer.create(indices.data(), indices.size() * sizeof(indices[0]));
 
     auto bindingDescription = Vertex::getBindingDescription();
     auto attributeDescriptions = Vertex::getAttributeDescriptions();
 
-    mDescriptorPool = std::make_shared<rvkfw::RDescriptorPool>(physicalDevice(), logicalDevice(), swapChain());
-    mDescriptorPool->create(swapChain()->images().size(),
-                            std::vector<uint32_t>(swapChain()->images().size(), sizeof(Transformations)));
+    mDescriptorPool = rvkfw::RDescriptorPool::Creator(physicalDevice(), logicalDevice(), swapChain()).
+                            create(swapChain()->images().size(),
+                                   std::vector<uint32_t>(swapChain()->images().size(), sizeof(Transformations)));
 
-    mGraphicsPipeline->pipelineLayoutInfo().setLayoutCount = 1;
-    mGraphicsPipeline->pipelineLayoutInfo().pSetLayouts = mDescriptorPool->descriptorSetLayout();
+    graphicsPipelineCreator.pipelineLayoutInfo().setLayoutCount = 1;
+    graphicsPipelineCreator.pipelineLayoutInfo().pSetLayouts = mDescriptorPool->descriptorSetLayout();
 
-    mGraphicsPipeline->vertexInputInfo().vertexBindingDescriptionCount = 1;
-    mGraphicsPipeline->vertexInputInfo().vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+    graphicsPipelineCreator.vertexInputInfo().vertexBindingDescriptionCount = 1;
+    graphicsPipelineCreator.vertexInputInfo().vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
 
-    mGraphicsPipeline->vertexInputInfo().pVertexBindingDescriptions = &bindingDescription;
-    mGraphicsPipeline->vertexInputInfo().pVertexAttributeDescriptions = attributeDescriptions.data();
+    graphicsPipelineCreator.vertexInputInfo().pVertexBindingDescriptions = &bindingDescription;
+    graphicsPipelineCreator.vertexInputInfo().pVertexAttributeDescriptions = attributeDescriptions.data();
 
-    mGraphicsPipeline->create(mShaderDirectory + "/Shader.vert.spv",
+    mGraphicsPipeline = graphicsPipelineCreator.create(mShaderDirectory + "/Shader.vert.spv",
                               mShaderDirectory + "/Shader.frag.spv");
     
-    mCommandBuffer = std::make_shared<rvkfw::RCommandBuffer>(mRenderPass, swapChain(),
+    mCommandBuffer = rvkfw::RCommandBuffer::Creator(mRenderPass, swapChain(),
                                                              logicalDevice(), mFrameBuffer, mGraphicsPipeline,
-                                                             commandPool());
-    mCommandBuffer->create();
+                                                    commandPool()).create();
 
-    mDrawHelper = std::make_shared<rvkfw::RDrawHelper>(logicalDevice(), swapChain());
-    mDrawHelper->create(2);
+    mDrawHelper = rvkfw::RDrawHelper::Creator(logicalDevice(), swapChain(), commandPool()).create(2);
 
     recordDrawCommands();
 

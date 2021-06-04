@@ -16,9 +16,7 @@ class RWindow;
 
 class RVkInstance: public std::enable_shared_from_this<RVkInstance>, public RObject {
 public:
-    RVkInstance(std::weak_ptr<RWindow> window) : mWindow{window} {
-    }
-
+    RVkInstance(std::weak_ptr<RWindow> window);
     ~RVkInstance();
 
     void preCreate() override;
@@ -52,7 +50,11 @@ public:
     }
 
     void destroy() override;
-    
+
+    VkApplicationInfo &appInfo() {
+        return mAppInfo;
+    }
+
 protected:
     VkResult mResult{ VK_NOT_READY };
     VkInstance mInstance{ VK_NULL_HANDLE };

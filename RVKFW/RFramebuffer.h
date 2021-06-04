@@ -39,6 +39,25 @@ protected:
     std::weak_ptr<RLogicalDevice> mLogicalDevice;
 
     std::vector<VkFramebuffer> mSwapChainFramebuffers;
+
+public:
+    class Creator {
+    public:
+        Creator(std::shared_ptr<RRenderPass> renderPass,
+                     std::shared_ptr<RSwapChain> swapChain,
+                     std::shared_ptr<RLogicalDevice> logicalDevice) :
+            mObject{std::make_shared<RFramebuffer>(renderPass, swapChain, logicalDevice)} {
+                mObject->preCreate();
+        }
+
+        std::shared_ptr<RFramebuffer> create() {
+            mObject->create();
+            return mObject;
+        }
+
+    private:
+        std::shared_ptr<RFramebuffer> mObject;
+    };
 };
 
 }

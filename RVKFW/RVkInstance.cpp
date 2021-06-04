@@ -6,6 +6,17 @@
 
 namespace rvkfw {
 
+RVkInstance::RVkInstance(std::weak_ptr<RWindow> window) : mWindow{window} {
+    mAppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    mAppInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+    mAppInfo.pEngineName = "No Engine";
+    mAppInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+    mAppInfo.apiVersion = VK_API_VERSION_1_0;
+
+    mCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    mCreateInfo.pApplicationInfo = &mAppInfo;
+}
+
 void RVkInstance::preCreate() {
     mSurface = std::make_shared<RSurface>(shared_from_this(), mWindow);
     mSurface->preCreate();
@@ -21,14 +32,7 @@ void RVkInstance::create(const std::string &appName) {
         return;
     }
 
-    mAppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     mAppInfo.pApplicationName = appName.c_str();
-    mAppInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-    mAppInfo.pEngineName = "No Engine";
-    mAppInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    mAppInfo.apiVersion = VK_API_VERSION_1_0;
-
-    mCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     mCreateInfo.pApplicationInfo = &mAppInfo;
 
     uint32_t glfwExtensionCount = 0;

@@ -3,7 +3,7 @@
 #include "RLogicalDevice.h"
 #include "RPhysicalDevice.h"
 #include "RLogger.h"
-#include "RVertexBuffer.h"
+#include "RBufferObject.h"
 
 namespace rvkfw {
 
@@ -57,15 +57,13 @@ void RDescriptorPool::create(uint32_t size, const std::vector<uint32_t> &sizePer
     }
 
     for (int i=0; i<size; ++i) {
-        auto buffer = std::make_shared<RVertexBuffer>(physicalDevice, logicalDevice);
-        buffer->preCreate();
+        auto bufferCreator = RBufferObject::Creator(physicalDevice, logicalDevice);
 
-        buffer->bufferInfo().usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-        buffer->setMemoryProperties(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+        bufferCreator.bufferInfo().usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+        bufferCreator.setMemoryProperties(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                      VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        buffer->create(nullptr, sizePerBuffer[i]);
-        mBuffers.push_back(buffer);
+        mBuffers.push_back(bufferCreator.create(nullptr, sizePerBuffer[i]));
     }
 
     std::vector<VkDescriptorSetLayout> layouts(size, mDescriptorSetLayout);

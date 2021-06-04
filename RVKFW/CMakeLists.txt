@@ -7,6 +7,9 @@ file (GLOB RVKFW_HEADERS CONFIGURE_DEPENDS "*.h")
 
 add_library(RVKFW SHARED ${RVKFW_HEADERS} ${RVKFW_SOURCES})
 
+add_compile_definitions(STB_IMAGE_IMPLEMENTATION)
+list(APPEND CUSTOM_INCLUDES "../external")
+
 target_include_directories(RVKFW PUBLIC ${CUSTOM_INCLUDES})
 target_link_libraries(RVKFW ${CUSTOM_LIBRARIES})
 

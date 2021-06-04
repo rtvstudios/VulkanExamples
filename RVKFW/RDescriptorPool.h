@@ -8,7 +8,7 @@ namespace rvkfw {
 
 class RLogicalDevice;
 class RPhysicalDevice;
-class RVertexBuffer;
+class RBufferObject;
 class RSwapChain;
 
 class RDescriptorPool: public RObject {
@@ -28,6 +28,10 @@ public:
         return "RDescriptorPool";
     }
 
+    VkDescriptorPool handle() const {
+        return mDescriptorPool;
+    }
+
     VkDescriptorPoolSize &poolSize() {
         return mPoolSize;
     }
@@ -38,10 +42,6 @@ public:
 
     VkDescriptorSetAllocateInfo &setAllocInfo() {
         return mSetAllocInfo;
-    }
-
-    VkDescriptorPool handle() const {
-        return mDescriptorPool;
     }
 
     VkDescriptorSetLayout *descriptorSetLayout() {
@@ -60,7 +60,7 @@ public:
         return mBuffers.size();
     }
 
-    std::shared_ptr<RVertexBuffer> buffer(int loc) {
+    std::shared_ptr<RBufferObject> buffer(int loc) {
         return mBuffers[loc];
     }
 
@@ -81,12 +81,55 @@ protected:
     VkDescriptorPoolCreateInfo mPoolInfo{};
     VkDescriptorSetAllocateInfo mSetAllocInfo{};
 
-    std::vector<std::shared_ptr<RVertexBuffer>> mBuffers;
+    std::vector<std::shared_ptr<RBufferObject>> mBuffers;
 
     VkDescriptorSetLayout mDescriptorSetLayout{VK_NULL_HANDLE};
     VkDescriptorPool mDescriptorPool{ VK_NULL_HANDLE};
 
     std::vector<VkDescriptorSet> mDescriptorSets{};
+
+public:
+    class Creator {
+    public:
+        Creator(std::shared_ptr<RPhysicalDevice> physicalDevice,
+                std::shared_ptr<RLogicalDevice> logicalDevice,
+                std::shared_ptr<RSwapChain> swapChain) :
+            mObject {std::make_shared<RDescriptorPool>(physicalDevice, logicalDevice, swapChain)} {
+                mObject->preCreate();
+       }
+
+        VkDescriptorPoolSize &poolSize() {
+            return mObject->poolSize();
+        }
+
+        VkDescriptorPoolCreateInfo &poolInfo() {
+            return mObject->poolInfo();
+        }
+
+        VkDescriptorSetAllocateInfo &setAllocInfo() {
+            return mObject->setAllocInfo();
+        }
+
+        VkDescriptorSetLayout *descriptorSetLayout() {
+            return mObject->descriptorSetLayout();
+        }
+
+        VkDescriptorSetLayoutBinding &layoutBinding() {
+            return mObject->layoutBinding();
+        }
+
+        VkDescriptorSetLayoutCreateInfo &layoutInfo() {
+            return mObject->layoutInfo();
+        }
+
+        std::shared_ptr<RDescriptorPool> create(uint32_t size, const std::vector<uint32_t> &sizePerBuffer) {
+            mObject->create(size, sizePerBuffer);
+            return mObject;
+        }
+
+    private:
+        std::shared_ptr<RDescriptorPool> mObject;
+    };
 };
 
 }
