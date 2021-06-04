@@ -9,12 +9,12 @@ namespace rvkfw {
 class RLogicalDevice;
 class RPhysicalDevice;
 
-class RVertexBuffer: public RObject {
+class RBufferObject: public RObject {
 public:
-    RVertexBuffer(std::shared_ptr<RPhysicalDevice> physicalDevice,
+    RBufferObject(std::shared_ptr<RPhysicalDevice> physicalDevice,
                   std::shared_ptr<RLogicalDevice> logicalDevice);
 
-    ~RVertexBuffer() {
+    ~RBufferObject() {
         destroy();
     }
 

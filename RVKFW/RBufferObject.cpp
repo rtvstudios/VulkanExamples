@@ -1,12 +1,12 @@
 
-#include "RVertexBuffer.h"
+#include "RBufferObject.h"
 #include "RLogicalDevice.h"
 #include "RPhysicalDevice.h"
 #include "RLogger.h"
 
 namespace rvkfw {
 
-RVertexBuffer::RVertexBuffer(std::shared_ptr<RPhysicalDevice> physicalDevice,
+RBufferObject::RBufferObject(std::shared_ptr<RPhysicalDevice> physicalDevice,
                              std::shared_ptr<RLogicalDevice> logicalDevice) :
     mPhysicalDevice{physicalDevice},
     mLogicalDevice{logicalDevice} {
@@ -16,7 +16,7 @@ RVertexBuffer::RVertexBuffer(std::shared_ptr<RPhysicalDevice> physicalDevice,
     mBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 }
 
-uint32_t RVertexBuffer::findMemoryType(const VkPhysicalDeviceMemoryProperties &memProperties,
+uint32_t RBufferObject::findMemoryType(const VkPhysicalDeviceMemoryProperties &memProperties,
                                        uint32_t typeFilter, VkMemoryPropertyFlags properties) {
 
     for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
@@ -30,7 +30,7 @@ uint32_t RVertexBuffer::findMemoryType(const VkPhysicalDeviceMemoryProperties &m
     throw std::runtime_error("Failed to find suitable memory type!");
 }
 
-void RVertexBuffer::create(const void *data, int size) {
+void RBufferObject::create(const void *data, int size) {
     if (mCreated.exchange(true)) {
         return;
     }
@@ -70,7 +70,7 @@ void RVertexBuffer::create(const void *data, int size) {
     }
 }
 
-void RVertexBuffer::setData(const void *data, int size) {
+void RBufferObject::setData(const void *data, int size) {
     auto logicalDevice = mLogicalDevice.lock();
     ASSERT_NOT_NULL(logicalDevice);
 
@@ -85,7 +85,7 @@ void RVertexBuffer::setData(const void *data, int size) {
 }
 
 
-void RVertexBuffer::destroy() {
+void RBufferObject::destroy() {
     if (!mCreated.exchange(false)) {
         return;
     }
