@@ -40,6 +40,10 @@ void RCommandPool::create() {
     auto logicalDevice = mLogicalDevice.lock();
     ASSERT_NOT_NULL(logicalDevice);
 
+    if (!mCreatePoolInfo.queueFamilyIndex) {
+        mCreatePoolInfo.queueFamilyIndex = logicalDevice->graphicsQueue()->index();
+    }
+
     if (vkCreateCommandPool(logicalDevice->handle(), &mCreatePoolInfo, nullptr, &mCommandPool) != VK_SUCCESS) {
         LOG_ERROR(tag(), "Failed to create command pool!");
         throw std::runtime_error("failed to create command pool!");

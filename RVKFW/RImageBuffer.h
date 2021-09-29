@@ -29,8 +29,12 @@ public:
         return mImageInfo;
     }
 
-    VkImage handle() {
+    VkImage handle() const {
         return mImage;
+    }
+
+    VkFormat format() const {
+        return mImageInfo.format;
     }
 
     VkDeviceMemory deviceMemoryHandle() {

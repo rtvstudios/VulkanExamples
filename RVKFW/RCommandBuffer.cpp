@@ -25,7 +25,6 @@ RCommandBuffer::RCommandBuffer(std::weak_ptr<RRenderPass> renderPass,
     mAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 }
 
-
 size_t RCommandBuffer::imageCount() const {
     if (auto swapChain = mSwapChain.lock()) {
         return swapChain->images().size();

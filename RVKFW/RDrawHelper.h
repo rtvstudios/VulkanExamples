@@ -11,6 +11,8 @@ class RLogicalDevice;
 class RSwapChain;
 class RCommandBuffer;
 class RCommandPool;
+class RBufferObject;
+class RImageBuffer;
 
 class RDrawHelper: public RObject {
 public:
@@ -52,6 +54,13 @@ public:
     VkCommandBuffer beginSingleTimeCommands();
     void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
+    void copyBuffer(const std::shared_ptr<RBufferObject> &src,
+                    std::shared_ptr<RBufferObject> dst,
+                    uint32_t size);
+
+    void transitionImageLayout(const std::shared_ptr<RImageBuffer> &image,
+                               VkImageLayout oldLayout, VkImageLayout newLayout);
+    
 protected:
     std::weak_ptr<RLogicalDevice> mLogicalDevice;
     std::weak_ptr<RSwapChain> mSwapChain;

@@ -5,6 +5,8 @@
 #include "RCommandBuffer.h"
 #include "RCommandPool.h"
 #include "RQueue.h"
+#include "RBufferObject.h"
+#include "RImageBuffer.h"
 
 namespace rvkfw {
 
@@ -178,6 +180,51 @@ void RDrawHelper::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
     vkQueueWaitIdle(logicalDevice->graphicsQueue()->handle());
 
     vkFreeCommandBuffers(logicalDevice->handle(), commandPool->handle(), 1, &commandBuffer);
+}
+
+void RDrawHelper::copyBuffer(const std::shared_ptr<RBufferObject> &src,
+                std::shared_ptr<RBufferObject> dst,
+                uint32_t size) {
+
+    auto commandBuffer = beginSingleTimeCommands();
+
+    VkBufferCopy copyRegion{};
+    copyRegion.size = size;
+    vkCmdCopyBuffer(commandBuffer, src->handle(), dst->handle(), 1, &copyRegion);
+    endSingleTimeCommands(commandBuffer);
+}
+
+void RDrawHelper::transitionImageLayout(const std::shared_ptr<RImageBuffer> &image,
+                           VkImageLayout oldLayout, VkImageLayout newLayout) {
+
+    auto commandBuffer = beginSingleTimeCommands();
+
+    VkImageMemoryBarrier barrier{};
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout = oldLayout;
+    barrier.newLayout = newLayout;
+
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+
+    barrier.image = image->handle();
+    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = 1;
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = 1;
+
+    barrier.srcAccessMask = 0;
+    barrier.dstAccessMask = 0;
+
+    vkCmdPipelineBarrier(commandBuffer,
+                         0, 0,
+                         0,
+                         0, nullptr,
+                         0, nullptr,
+                         1, &barrier);
+
+    endSingleTimeCommands(commandBuffer);
 }
 
 }

@@ -89,6 +89,17 @@ void RImageBuffer::destroy() {
         return;
     }
 
+    if (auto logicalDevice = mLogicalDevice.lock()) {
+        if (mImage != VK_NULL_HANDLE) {
+            vkDestroyImage(logicalDevice->handle(), mImage, nullptr);
+            mImage = VK_NULL_HANDLE;
+        }
+        if (mTextureImageMemory != VK_NULL_HANDLE) {
+            vkFreeMemory(logicalDevice->handle(), mTextureImageMemory, nullptr);
+            mTextureImageMemory = VK_NULL_HANDLE;
+        }
+    }
+
     mBuffer = nullptr;
 }
 
